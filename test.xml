@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TournamentReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.usgo.org/tournaments/TournamentStandards/AGATournamentSchema.xsd">
+   <Header>
+      <Software>Eggplant</Software>
+      <StartDate>2013-10-29</StartDate>
+      <EndDate>2013-10-29</EndDate>
+      <TournamentName>Test Tournament</TournamentName>
+      <TournamentVenue>
+         <Name>quart</Name>
+      </TournamentVenue>
+      <PairingFormat>MCMAHON</PairingFormat>
+      <Rules>JAPANESE</Rules>
+      <BasicTime>0</BasicTime>
+      <OvertimeFormat>
+         <Canadian StoneCount="" TimeBlockSize=""/>
+      </OvertimeFormat>
+      <TiebreakSystemList>
+         <System Method="MMS" Tier="1"/>
+         <System Method="SOSM" Tier="2"/>
+         <System Method="SOSOSM" Tier="3"/>
+         <System Method="NULL" Tier="4"/>
+         <System Method="NULL" Tier="5"/>
+         <System Method="NULL" Tier="6"/>
+      </TiebreakSystemList>
+      <Comment>testaq</Comment>
+   </Header>
+   <PlayerList>
+      <Player FamilyName="A" GivenName="a" ID="99999" InitialTournamentScore="37" Rating="10K" eggplantagarating="-30.50" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="b" GivenName="b" ID="99998" InitialTournamentScore="37" Rating="9K" eggplantagarating="-30.50" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="c" GivenName="c" ID="99997" InitialTournamentScore="37" Rating="9K" eggplantagarating="-30.50" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="d" GivenName="d" ID="99996" InitialTournamentScore="37" Rating="8K" eggplantagarating="-30.50" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="q" GivenName="q" ID="99995" InitialTournamentScore="38" Rating="5K" eggplantagarating="-30.50" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="w" GivenName="w" ID="99994" InitialTournamentScore="38" Rating="4K" eggplantagarating="-30.50" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="asdf" GivenName="fdsa" ID="99993" InitialTournamentScore="37" Rating="8K" eggplantagarating="-30.50" eggplantparticipation="UNKNOWN,UNKNOWN,UNKNOWN,"/>
+   </PlayerList>
+   <RoundList>
+      <Round RoundNumber="1">
+         <Game BlackPlayerID="99994" GameResult="Unknown" Handicap="1" Komi="0" WhitePlayerID="99995" eggplantresult="UNKNOWN"/>
+         <Game BlackPlayerID="99997" GameResult="Unknown" Handicap="1" Komi="0" WhitePlayerID="99999" eggplantresult="UNKNOWN"/>
+         <Game BlackPlayerID="99996" GameResult="Unknown" Handicap="1" Komi="0" WhitePlayerID="99998" eggplantresult="UNKNOWN"/>
+      </Round>
+      <Round RoundNumber="2"/>
+      <Round RoundNumber="3"/>
+   </RoundList>
+   <eggplant>
+      <numberofrounds>3</numberofrounds>
+      <mmbar>9D</mmbar>
+      <mmfloor>30K</mmfloor>
+      <lastroundforseedsystem>1</lastroundforseedsystem>
+      <pairingscheme1>SPLIT_AND_SLIP</pairingscheme1>
+      <pairingscheme2>SPLIT_AND_SLIP</pairingscheme2>
+      <handicapgames>false</handicapgames>
+      <maxhandicappedrank>1D</maxhandicappedrank>
+      <handicapbasis>RANK</handicapbasis>
+      <handicapmodifier>0</handicapmodifier>
+      <handicapceiling>9</handicapceiling>
+      <defaultkomi>6</defaultkomi>
+      <lastassignedagano>99993</lastassignedagano>
+      <absentnbwx2>0</absentnbwx2>
+      <absentmmsx2>0</absentmmsx2>
+      <byenbwx2>1</byenbwx2>
+      <byemmsx2>1</byemmsx2>
+   </eggplant>
+</TournamentReport>

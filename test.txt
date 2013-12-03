@@ -1,0 +1,79 @@
+TOURNEY Test Tournament, quart
+	start=10/29/2013
+	finish=10/29/2013
+	rules=Japanese
+
+PLAYERS
+99997	c, c	9K
+99998	b, b	9K
+99999	A, a	10K
+99993	asdf, fdsa	8K
+99994	w, w	4K
+99995	q, q	5K
+99996	d, d	8K
+
+GAMES 1
+99995	99994	?	0	0
+99999	99997	?	0	0
+99998	99996	?	0	0
+
+GAMES 2
+
+GAMES 3
+END
+
+NEW REGISTRATIONS
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99997
+Name: c, c
+Address: ***
+E-mail: ***
+
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99998
+Name: b, b
+Address: ***
+E-mail: ***
+
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99999
+Name: A, a
+Address: ***
+E-mail: ***
+
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99993
+Name: asdf, fdsa
+Address: ***
+E-mail: ***
+
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99994
+Name: w, w
+Address: ***
+E-mail: ***
+
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99995
+Name: q, q
+Address: ***
+E-mail: ***
+
+AGA - ***full/promotional/ratings only***
+AGA Fee: ***
+AGA number: 99996
+Name: d, d
+Address: ***
+E-mail: ***
+
+
+TD: ***
+	***email***
+
+Organizer: Seattle Go Center
