@@ -1,8 +1,6 @@
 package org.seattlego.eggplant.model;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Contains methods for pairing a group of players. This class exists to keep 

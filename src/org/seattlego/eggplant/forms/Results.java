@@ -13,14 +13,17 @@ import javax.swing.JTable;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.table.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 import org.jdesktop.beansbinding.*;
 import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.SwingBindings;
 import org.seattlego.eggplant.interfaces.ITournament;
-import org.seattlego.eggplant.model.*;
+import org.seattlego.eggplant.model.FlaggedPlayerName;
+import org.seattlego.eggplant.model.Game;
+import org.seattlego.eggplant.model.GameResult;
 
 /**
  *
@@ -236,6 +239,9 @@ public class Results extends EggplantForm {
 
 
 class ResultsTableCellRenderer extends JLabel implements TableCellRenderer {
+    
+    private final Color BORDER_COLOR = new Color( 180, 200, 180 );
+            
     // This method is called each time a cell in a column
     // using this renderer needs to be rendered.
     @Override
@@ -248,10 +254,11 @@ class ResultsTableCellRenderer extends JLabel implements TableCellRenderer {
         
         if ( typedValue.isWinner ) {
             
-            this.setBorder( new CompoundBorder( new EmptyBorder(new Insets(2,2,2,2)), 
-                                                new LineBorder( Color.BLACK, 1 ) ) );
+            this.setBorder( new CompoundBorder( new LineBorder( BORDER_COLOR, 3 ),
+                                                new EmptyBorder(new Insets(1,1,1,1)) )
+                                                 );
         } else {
-            this.setBorder( new EmptyBorder(new Insets(2,2,2,2)) );
+            this.setBorder( new EmptyBorder(new Insets(4,4,4,4)) );
         }
         //setForeground( Color.BLACK );
         //setFont( new Font("Dialog", Font.PLAIN, 12 ) );

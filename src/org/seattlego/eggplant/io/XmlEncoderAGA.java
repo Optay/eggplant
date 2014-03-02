@@ -201,7 +201,7 @@ TournamentStaffList
         eggplant.appendChild( XmlUtils.CreateElement( document, "absentnbwx2", Integer.toString( tournament.getPlacementProps().getGenNbw2ValueAbsent() ) ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "absentmmsx2", Integer.toString( tournament.getPlacementProps().getGenMms2ValueAbsent() ) ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "byenbwx2", Integer.toString( tournament.getPlacementProps().getGenNbw2ValueBye() ) ) );
-        eggplant.appendChild( XmlUtils.CreateElement( document, "byemmsx2", Integer.toString( tournament.getPlacementProps().getGenMmw2ValueBye() ) ) );
+        eggplant.appendChild( XmlUtils.CreateElement( document, "byemmsx2", Integer.toString( tournament.getPlacementProps().getGenMms2ValueBye() ) ) );
         
         //
         

@@ -185,7 +185,7 @@ public class TournamentSettings extends EggplantForm {
         // Placement
         setRadioSelection( absentMms, Integer.toString( tournament.getPlacementProps().getGenMms2ValueAbsent() ) );
         setRadioSelection( absentNbw, Integer.toString( tournament.getPlacementProps().getGenNbw2ValueAbsent() ) );
-        setRadioSelection( byeMms, Integer.toString( tournament.getPlacementProps().getGenMmw2ValueBye() ) );
+        setRadioSelection( byeMms, Integer.toString( tournament.getPlacementProps().getGenMms2ValueBye() ) );
         setRadioSelection( byeNbw, Integer.toString( tournament.getPlacementProps().getGenNbw2ValueBye() ) );
         //
         
@@ -516,6 +516,7 @@ public class TournamentSettings extends EggplantForm {
 
         templateDescription.setColumns(20);
         templateDescription.setEditable(false);
+        templateDescription.setLineWrap(true);
         templateDescription.setRows(5);
         jScrollPane7.setViewportView(templateDescription);
 
@@ -1649,6 +1650,7 @@ public class TournamentSettings extends EggplantForm {
         });
 
         newTemplateDescription.setColumns(20);
+        newTemplateDescription.setLineWrap(true);
         newTemplateDescription.setRows(5);
         jScrollPane8.setViewportView(newTemplateDescription);
 
@@ -1692,7 +1694,7 @@ public class TournamentSettings extends EggplantForm {
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
-                .addGap(0, 10, Short.MAX_VALUE)
+                .addGap(0, 9, Short.MAX_VALUE)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1879,6 +1881,8 @@ public class TournamentSettings extends EggplantForm {
     private void tfNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNameFocusLost
         tournament.getProps().setName( tfName.getText() );
         tournament.setChangedSinceLastSave(true);
+        
+        tournament.fireIdChange();
     }//GEN-LAST:event_tfNameFocusLost
 
     private void timeDetailsFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeDetailsFocusLost
@@ -1907,12 +1911,15 @@ public class TournamentSettings extends EggplantForm {
         tournament.getProps().setStartDate( tfStartDate.getText() );
         tfStartDate.setText(tournament.getProps().getStartDateString() );
         tournament.setChangedSinceLastSave(true);
+        tournament.fireIdChange();
+        
     }//GEN-LAST:event_tfStartDateFocusLost
 
     private void tfEndDateFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfEndDateFocusLost
         tournament.getProps().setEndDate( tfEndDate.getText() );
         tfEndDate.setText(tournament.getProps().getEndDateString() );
         tournament.setChangedSinceLastSave(true);
+        tournament.fireIdChange();
     }//GEN-LAST:event_tfEndDateFocusLost
 
     private void addTemplateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTemplateButtonActionPerformed
@@ -1924,7 +1931,7 @@ public class TournamentSettings extends EggplantForm {
         
         // Check for existing template and get confirmation.
         if ( TemplateManager.getTemplate( name ) != null ) {
-            int response = JOptionPane.showConfirmDialog( this, "Replace template " + name + " with current tournament settings?", "Query", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
+            int response = JOptionPane.showConfirmDialog( this, "Replace template " + name + " with current tournament settings?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if ( response != JOptionPane.YES_OPTION ) {
                 return;
             }
@@ -1958,7 +1965,7 @@ public class TournamentSettings extends EggplantForm {
             JOptionPane.showMessageDialog(this, "No template selected.", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        int response = JOptionPane.showConfirmDialog(this, "Applying a template will overwrite current tournament settings. Continue?", "Query", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION );
+        int response = JOptionPane.showConfirmDialog(this, "Applying a template will overwrite current tournament settings. Continue?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
         if (response == JOptionPane.YES_OPTION) {
             TemplateManager.applyTemplate( selectedTemplateName, tournament );
             updateControls();            

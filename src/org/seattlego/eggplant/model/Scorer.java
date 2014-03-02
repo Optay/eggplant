@@ -12,6 +12,16 @@ import org.seattlego.eggplant.model.comparators.PlayerComparator;
  */
 public class Scorer {
     
+    /**
+     * Calculates score values (placement criteria) for all players for all 
+     * rounds.
+     * 
+     * Note: For a given round, the score value is based on the results of games
+     * from that round and earlier. So the scores for round index 0 includes the
+     * results of round 0 games.
+     * 
+     * 
+     */
     public static void scorePlayers( ArrayList<Player> players, int numberOfRounds, ArrayList<Game> games, PlacementProperties placementProps ) {
         
 
@@ -62,7 +72,7 @@ public class Scorer {
                 }
                 if (p.getParticipation(r) == Participation.BYE) {
                     nbPtsNbw2AbsentOrBye += placementProps.getGenNbw2ValueBye();
-                    nbPtsMms2AbsentOrBye += placementProps.getGenMmw2ValueBye();
+                    nbPtsMms2AbsentOrBye += placementProps.getGenMms2ValueBye();
                 }
                 p.getScore().incrementMetric( r, PlacementCriterion.NBW, nbPtsNbw2AbsentOrBye);
                 p.getScore().incrementMetric( r, PlacementCriterion.MMS, nbPtsMms2AbsentOrBye);
@@ -70,20 +80,29 @@ public class Scorer {
         }
 
         // 3) CUSSW and CUSSM
+        /* Cumulative Sum of Scores
+         * CUSSM = Sum of a player's McMahon scores for each round
+         * CUSSW = Sum of a player's NBW for each round
+         */
         for (Player p : players) {
             p.getScore().setMetric( 0, PlacementCriterion.CUSSW, 0 );
             p.getScore().setMetric( 0, PlacementCriterion.CUSSM, 0 );
-            for (int r = 1; r < numberOfRounds; r++) {
-                p.getScore().setMetric( 0, PlacementCriterion.CUSSW,
-                        p.getScore().getMetric( (r-1), PlacementCriterion.CUSSW ) +
-                        p.getScore().getMetric( r, PlacementCriterion.NBW ) );
-                p.getScore().setMetric( 0, PlacementCriterion.CUSSM,
-                        p.getScore().getMetric( (r-1), PlacementCriterion.CUSSM ) +
-                        p.getScore().getMetric( r, PlacementCriterion.MMS ) );
+            for (int r = 0; r < numberOfRounds; r++) {
+                int cussw = p.getScore().getMetric( (r-1), PlacementCriterion.CUSSW ) +
+                            p.getScore().getMetric( r, PlacementCriterion.NBW );
+                p.getScore().setMetric( r, PlacementCriterion.CUSSW, cussw );
+                
+                int cussm = p.getScore().getMetric( (r-1), PlacementCriterion.CUSSM ) +
+                            p.getScore().getMetric( r, PlacementCriterion.MMS );
+                p.getScore().setMetric( r, PlacementCriterion.CUSSM, cussm );
             }
         }
 
         // 4.1) SOSW, SOSWM1, SOSWM2, SODOSW
+        /*
+         * Sum of Opponents' Scores NBW
+         * 
+         */
         for (int r = 0; r < numberOfRounds; r++) {
             for (Player p : players) {
                 int[] oswX2 = new int[numberOfRounds];
@@ -154,7 +173,14 @@ public class Scorer {
             }
         }
 
-        // 4.2) SOSM, SOSMM1, SOSMM2, SODOSM
+        /* 4.2) SOSM, SOSMM1, SOSMM2, SODOSM
+         * Sum of Opponents' Scores - MMS
+         * 
+         * SOSM = Sum of Opponents' McMahon Scores + handicap stones given
+         * SOSMM1 = SOSM - lowest score
+         * SOSMM2 = SOSM - two lowest scores
+         * SODOSM = Sum of Defeated Opponents' McMahon Scores + handicap stones given
+         */
         for (int r = 0; r < numberOfRounds; r++) {
             for (Player p : players) {
                 int[] osmX2 = new int[numberOfRounds];
@@ -167,21 +193,39 @@ public class Scorer {
                         Player opp = g.getOpponent( p );
                         
                         osmX2[rr] = opp.getScore().getMetric( r, PlacementCriterion.MMS );//playerScoring.getMMSX2(r);
+                        
+                        // Add handicap compensation to the white player's score.
                         if ( p == g.getWhitePlayer() ) {
                             osmX2[rr] += 2 * g.getHandicap();
                         } else {
-                            osmX2[rr] -= 2 * g.getHandicap();
+                            // We don't have to penalize black for receiving a handicap.
+                            // This compensation is only applied to the white player.
+                            //osmX2[rr] -= 2 * g.getHandicap();
                         }
+                        
+                        /* Defeated opponents' scores is calculated by scaling
+                         * the opponent's score by the game result:
+                         * 2 for a win
+                         * 1 for a draw
+                         * 0 for a loss
+                         * 
+                         * The resulting total is a score scaled by 4.
+                         */
                         dosmX4[rr] = osmX2[rr] * g.getResultValueFor(p);
                         
                     }
                 }
+                
+                // Total them up.
+                // TODO - this can be done during the above loop.
                 int sosmX2 = 0;
                 int sodosmX4 = 0;
                 for (int rr = 0; rr <= r; rr++) {
                     sosmX2 += osmX2[rr];
                     sodosmX4 += dosmX4[rr];
                 }
+                //
+                
                 p.getScore().setMetric( r, PlacementCriterion.SOSM, sosmX2 );
                 p.getScore().setMetric( r, PlacementCriterion.SODOSM, sodosmX4 );
                 //p.playerScoring.setSOSMX2(r, sosX2);
@@ -229,10 +273,12 @@ public class Scorer {
             for (Player p : players) {
                 int sososwX2 = 0;
                 int sososmX2 = 0;
-                 for (int rr = 0; rr <= r; rr++) {
+                for (int rr = 0; rr <= r; rr++) {
+                    // If a player is not paired for a round, their own initial MMS is used to calculate
+                    // the missing SOS values.
                     if ( p.getParticipation(rr) != Participation.PAIRED) {
                         sososwX2 += 0;
-                        sososmX2 += 2 * p.getScore().getInitialMms() * (r + 1);    // TODO - suspicious scaling. Look this up.
+                        sososmX2 += 2 * p.getScore().getInitialMms() * (r + 1);
                     } else {
                         Game g = getGame( games, rr, p );//p.playerScoring.getGame(rr);
                         Player opp = g.getOpponent( p );
@@ -334,7 +380,7 @@ public class Scorer {
         for (int mainScore = mainScoreMax; mainScore >= mainScoreMin; mainScore--) {
             ArrayList<Player> groupPlayers = new ArrayList<>();
             for (Player p : players) {
-                if ( (p.getScore().getMetric( (roundIndex-1), mainCrit ) / 2) != mainScore) {
+                if ( (p.getScore().getMetric( (roundIndex-1), mainCrit ) ) != (mainScore * mainCrit.coef ) ) {
                         //getCritValue(mainCrit, roundIndex - 1) / 2 != mainScore) {
                     continue;
                 }
@@ -350,10 +396,12 @@ public class Scorer {
             PlacementCriterion[] paiCrit = new PlacementCriterion[ placementProps.getPlaCriteria().length + 1 ];
             System.arraycopy(placementProps.getPlaCriteria(), 0, paiCrit, 0, placementProps.getPlaCriteria().length);
             
+            
             // Add additional rating sort if round is below specified threshold
+            // Note that we sort on RANK not RATING because new players will have a RATING of -30.5 regardless of their RANK.
             PlacementCriterion additionalCriterion = PlacementCriterion.NULL;
             if ( roundIndex <= pairingProps.getLastRoundForSeedSystem1() ) {
-                additionalCriterion = PlacementCriterion.RATING;
+                additionalCriterion = PlacementCriterion.RANK;
             }
             
             paiCrit[paiCrit.length - 1] = additionalCriterion;

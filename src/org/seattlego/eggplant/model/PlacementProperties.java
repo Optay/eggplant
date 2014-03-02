@@ -64,7 +64,7 @@ public class PlacementProperties {
         
     }
 
-    public int getGenMmw2ValueBye() { return genMms2ValueBye; }
+    public int getGenMms2ValueBye() { return genMms2ValueBye; }
     public void setGenMms2ValueBye(int genMms2ValueBye) { this.genMms2ValueBye = genMms2ValueBye; }    
     public void setGenMms2ValueBye( String value ) {
         try {

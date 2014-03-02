@@ -18,9 +18,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import org.seattlego.eggplant.interfaces.ITournament;
-import org.seattlego.eggplant.model.PlacementCriterion;
-import org.seattlego.eggplant.model.PlacementProperties;
-import org.seattlego.eggplant.model.Player;
+import org.seattlego.eggplant.model.*;
 import org.seattlego.eggplant.model.comparators.PlayerComparator;
 
 /**
@@ -51,11 +49,11 @@ public class Standings extends EggplantForm {
         displayedCriteria.add( PlacementCriterion.MMS );
         displayedCriteria.add( PlacementCriterion.SOSM );
         displayedCriteria.add( PlacementCriterion.SOSOSM );
-        displayedCriteria.add( PlacementCriterion.CUSSM );
+        //displayedCriteria.add( PlacementCriterion.CUSSM );
         displayedCriteria.add( PlacementCriterion.NBW );
-        displayedCriteria.add( PlacementCriterion.SOSW );
-        displayedCriteria.add( PlacementCriterion.SOSOSW );
-        displayedCriteria.add( PlacementCriterion.CUSSW );
+        //displayedCriteria.add( PlacementCriterion.SOSW );
+        //displayedCriteria.add( PlacementCriterion.SOSOSW );
+        //displayedCriteria.add( PlacementCriterion.CUSSW );
         //
         
         
@@ -154,7 +152,7 @@ public class Standings extends EggplantForm {
     public void setTournament( ITournament t ) {
         super.setTournament( t );
         
-        resetCriteria();
+        updateControls();
     }
     
     private void resetCriteria() {
@@ -232,6 +230,7 @@ public class Standings extends EggplantForm {
         
         TableColumn column;
         
+        // Player Number
         column = new TableColumn( 0, 25 );
         column.setHeaderValue("");
         standingsTable.addColumn( column );
@@ -239,11 +238,27 @@ public class Standings extends EggplantForm {
         column = new TableColumn( 1, 200 );
         column.setHeaderValue("Player");
         standingsTable.addColumn( column );
+
+        // Results
+        int columnIndex = 1;
+        for ( int round = 0; round <= roundPane.getRoundIndex(); round++ ) {
+            columnIndex++;
+            column = new TableColumn( columnIndex );
+            column.setHeaderValue("R" + Integer.toString( round + 1 ) );
+            standingsTable.addColumn( column );
+        }
         
+        // Place
+        columnIndex++;
+        column = new TableColumn( columnIndex, 25 );
+        column.setHeaderValue("Place");
+        standingsTable.addColumn( column );
+        //
+        
+        // Scores/Criteria/Tiebreaks
         // Sort criteria, so the columns appear in a consistent order.
         Collections.sort( displayedCriteria, new EnumOrdinalComparator() );
         
-        int columnIndex = 1;
         for ( PlacementCriterion pc : displayedCriteria ) {
             columnIndex ++;
             column = new TableColumn( columnIndex );
@@ -253,7 +268,7 @@ public class Standings extends EggplantForm {
         
         // Update table model to correct number of columns.
         DefaultTableModel tm = (DefaultTableModel) standingsTable.getModel();
-        tm.setColumnCount( 2 + displayedCriteria.size() );
+        tm.setColumnCount( 3 + (roundPane.getRoundIndex() + 1) + displayedCriteria.size() );
         //
         
     }
@@ -288,21 +303,35 @@ public class Standings extends EggplantForm {
         Player previous = null;
         
         for ( Player p : players ) {
-            String[] rowData = new String[ 2 + displayedCriteria.size() ];
+            String[] rowData = new String[ 3 + (roundPane.getRoundIndex() + 1) + displayedCriteria.size() ];
 
+            rowData[0] = Integer.toString( players.indexOf( p ) + 1 );
+
+            rowData[1] = p.getId().getFullName();
+            
+            int columnIndex = 1;
+            // Results
+            for ( int round = 0; round <= roundPane.getRoundIndex(); round++ ) {
+                columnIndex++;
+                rowData[ columnIndex ] = gameResultString( players, p, round );
+            }
+            //
+            
+            // Place
             // If player is not tied with previous player, increment and write position.
+            columnIndex++;
             if ( previous != null ) {
                 tied = ( tieDetector.compare( p, previous ) == 0 );
             }
             if ( !tied ) {
                 position++;
-                rowData[0] = Integer.toString( position );
+                rowData[columnIndex] = Integer.toString( position );
             }
             previous = p;
             //
-
-            rowData[1] = p.getId().getFullName();
-            int columnIndex = 1;
+            
+            
+            // Scores/Criteria/Tiebreaks
             for ( PlacementCriterion pc : displayedCriteria ) {
                 columnIndex++;
                 
@@ -334,10 +363,92 @@ public class Standings extends EggplantForm {
         // int currentRoundIndex = roundPane.getRoundIndex();
         
         tournament.updateScoring();
+        
         resetCriteria();
+        
+        setTableColumns();
         populateTable();
         
+    }
+    
+    /**
+     * Generate string with a "oooortch" format
+     * oooo being opponent number,
+     * r being the result "+", "-", "=" or "?"
+     * t (type) is either "/" for normal results or "!" for by default results
+     * c being the colour, "w", "b" or "?"
+     * h being handicap, "0" ... "9"
+     * @param tps Tournament parameter set. useful for placement criteria and for absent and values scores
+     */
+    private String gameResultString( ArrayList<Player> players, Player p, int roundIndex ) {
+        
+        Game game = tournament.getGame( roundIndex, p );
+                
+        String strOpponent;
+        String strResult;
+        String strType;
+        String strColor;
+        String strHandicap;
+
+        if (game == null){
+            strOpponent = "   0";
+            strColor = " ";
+            strType = " ";
+            strHandicap  = " ";
+            
+            int resultValue;
+            switch ( p.getParticipation(roundIndex) ) {
+                case ABSENT:
+                    resultValue = tournament.getPlacementProps().getGenMms2ValueAbsent();
+                    break;
+                case BYE:
+                    resultValue = tournament.getPlacementProps().getGenMms2ValueBye();
+                    break;
+                case NOT_ASSIGNED:
+                default:
+                    resultValue = 0;
+            }
+            switch( resultValue ) {
+                case 2:
+                    strResult = "+"; break;
+                case 1:
+                    strResult = "="; break;
+                default:
+                    strResult = "-";
+            }
+        } else {    // Game exists
+            Player opp = null;
+            GameResult result = game.getResult();
+            if ( result == GameResult.UNKNOWN) strType = "/";
+            else {
+                if ( result.getType() == GameResultType.BY_DEFAULT ) strType = "!";
+                else strType = "/";
+            }
+            strResult = game.getResultFor(p).getAbbreviation();
+            if (!game.isKnownColor()) strColor = "?";
+            else strColor = (game.getWhitePlayer() == p ) ? "w" : "b";
+
+            int oppNum = players.indexOf( game.getOpponent( p ) );
+            strOpponent = "    " + (oppNum + 1);
+            strOpponent = strOpponent.substring(strOpponent.length() - 4);  // To have 4 chars exactly
+            strHandicap = "" + game.getHandicap();
+        }
+        return strOpponent + strResult + strType + strColor + strHandicap;
     }    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -466,3 +577,89 @@ class EnumOrdinalComparator implements Comparator<PlacementCriterion> {
         else return 0;
     }
 }
+
+
+    /**
+     * Generate strings with a "oooortch" format
+     * oooo being opponent number,
+     * r being the result "+", "-", "=" or "?"
+     * t (type) is either "/" for normal results or "!" for by default results
+     * c being the colour, "w", "b" or "?"
+     * h being handicap, "0" ... "9"
+     * @param tps Tournament parameter set. useful for placement criteria and for absent and values scores
+     */
+    /* TODO - Fix this when it is needed.
+    public static String[][] halfGamesStrings(ArrayList<Player> alOrderedScoredPlayers, int roundNumber, TournamentParameterSet tps) {
+        GeneralParameterSet gps = tps.getGeneralParameterSet();
+        // Prepare hmPos for fast retrieving
+        HashMap<String, Integer> hmPos = new HashMap<String, Integer>();
+        for (int i = 0; i < alOrderedScoredPlayers.size(); i++){
+            hmPos.put(alOrderedScoredPlayers.get(i).getKeyString(), i);
+        }
+        String[][] hG = new String[roundNumber +1][alOrderedScoredPlayers.size()];
+        for (int i = 0; i < alOrderedScoredPlayers.size(); i++){
+            Player p = alOrderedScoredPlayers.get(i);
+            for(int r = 0; r <= roundNumber; r++){
+                String strOpp = "   0";
+                String strRes = " ";
+                String strTyp = "/";
+                String strCol = " ";
+                String strHd  = "0";
+
+                Game g = p.playerScoring.gameArray[r];
+                if (g == null){
+                    strOpp = "   0";
+                    strCol = " ";
+                    strTyp = " ";
+                    strHd  = " ";
+                    if (p.playerScoring.participation[r] == PlayerScoring.NOT_ASSIGNED) strRes = "-";
+                    else{
+                        int res = 0;
+                        if (p.playerScoring.participation[r] == PlayerScoring.ABSENT)
+                            if (tps.tournamentType() == TournamentParameterSet.TYPE_MACMAHON) res = gps.getGenMMS2ValueAbsent();
+                            else res = gps.getGenNBW2ValueAbsent();
+                        else if (p.playerScoring.participation[r] == PlayerScoring.BYE)
+                            if (tps.tournamentType() == TournamentParameterSet.TYPE_MACMAHON) res = gps.getGenMMS2ValueBye();
+                            else res = gps.getGenNBW2ValueBye();
+                        if (res == 2) strRes = "+";
+                        else if (res == 1) strRes = "=";
+                        else strRes = "-";
+                    }
+                }
+                else{   //Real Game
+                   Player opp = null;
+                   int result = g.getResult();
+                   if (result == Game.RESULT_UNKNOWN) strTyp = "/";
+                   else strTyp = (result >= Game.RESULT_BYDEF) ? "!" : "/";
+                   int res = result;
+                   if (result >= Game.RESULT_BYDEF) res = result - Game.RESULT_BYDEF;
+                   if (g.getWhitePlayer().hasSameKeyString(p)){
+                       opp = g.getBlackPlayer();
+                       strCol = "w";
+                       if (res == Game.RESULT_WHITEWINS || res == Game.RESULT_BOTHWIN) strRes = "+";
+                       else if (res == Game.RESULT_BLACKWINS || res == Game.RESULT_BOTHLOSE) strRes = "-";
+                       else if (res == Game.RESULT_EQUAL) strRes = "=";
+                       else strRes = "?";
+                   }
+                   else{
+                       opp = g.getWhitePlayer();
+                       strCol = "b";
+                       if (res == Game.RESULT_BLACKWINS || res == Game.RESULT_BOTHWIN) strRes = "+";
+                       else if (res == Game.RESULT_WHITEWINS || res == Game.RESULT_BOTHLOSE) strRes = "-";
+                       else if (res == Game.RESULT_EQUAL) strRes = "=";
+                       else strRes = "?" ;
+
+                   }
+                   if (!g.isKnownColor()) strCol = "?";
+
+                   int oppNum = hmPos.get(opp.getKeyString());
+                   strOpp = "    " + (oppNum +1);
+                   strOpp = strOpp.substring(strOpp.length() - 4);  // To have 4 chars exactly
+                   strHd = "" + g.getHandicap();
+                }
+                hG[r][i] = strOpp + strRes + strTyp + strCol + strHd;
+
+            }
+        }
+        return hG;
+    }*/

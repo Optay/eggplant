@@ -133,11 +133,12 @@ public class MainWindow extends javax.swing.JFrame {
         resultsPanel = new javax.swing.JPanel();
         standingsPanel = new javax.swing.JPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Eggplant");
         setPreferredSize(new java.awt.Dimension(1000, 700));
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosed(java.awt.event.WindowEvent evt) {
-                formWindowClosed(evt);
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
 
@@ -193,10 +194,12 @@ public class MainWindow extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jMainPaneStateChanged
 
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        tp.saveCurrentTournament();
-        
-    }//GEN-LAST:event_formWindowClosed
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        if ( tp.saveCurrentTournament() ) {
+         System.exit( 0 );
+        }
+
+    }//GEN-LAST:event_formWindowClosing
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

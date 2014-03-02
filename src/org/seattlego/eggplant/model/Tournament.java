@@ -1,16 +1,15 @@
 package org.seattlego.eggplant.model;
 
-import org.seattlego.eggplant.model.comparators.PlayerComparator;
-import org.seattlego.eggplant.model.comparators.GameComparator;
-import org.seattlego.eggplant.model.comparators.BandComparator;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.seattlego.eggplant.interfaces.ITournament;
+import org.seattlego.eggplant.model.comparators.BandComparator;
+import org.seattlego.eggplant.model.comparators.GameComparator;
+import org.seattlego.eggplant.model.comparators.PlayerComparator;
 
 /**
  * TODO
@@ -34,6 +33,8 @@ public class Tournament implements ITournament {
     // There is always a top band and a bottom band, but they may be empty
     // depending on how the bar/floor is set.
     private ArrayList<Band> bands;
+    
+    private ArrayList<ActionListener> idChangeListeners;
     
     
     private int newMemberNumber;
@@ -59,12 +60,25 @@ public class Tournament implements ITournament {
         props = new TournamentProperties();
         pairingProps = new PairingProperties();
         placementProps = new PlacementProperties();
-        byePlayers = new Player[ MAX_NUMBER_OF_PLAYERS ];  // TODO - size this more sensibly
+        byePlayers = new Player[ MAX_NUMBER_OF_PLAYERS ];  // TODO - size this more sensibly based on rounds or use a List of some type.
         
         scoringValid = false;
         
         newMemberNumber = 99999;
         uniqueKeyGenerator = 0;
+        
+        idChangeListeners = new ArrayList<>();
+    }
+    
+    @Override
+    public void addIdChangeListener( ActionListener l ) {
+        idChangeListeners.add( l );
+    }
+    @Override
+    public void fireIdChange() {
+        for ( ActionListener l : idChangeListeners ) {
+            l.actionPerformed( new ActionEvent(this, ActionEvent.ACTION_FIRST, "Tournament Id properties changed.") );
+        }
     }
     
     
@@ -105,7 +119,7 @@ public class Tournament implements ITournament {
     
     @Override
     public String getPrintHeadingString( String title ) {
-        return MessageFormat.format( "{0} - {1}\n{2}", getProps().getName(), getProps().getStartDateString(), title );
+        return MessageFormat.format( "{0} \u0077 {1}\n{2}", getProps().getName(), getProps().getStartDateString(), title );
         
     }
     
@@ -273,7 +287,7 @@ public class Tournament implements ITournament {
         
         bands = nonEmptyBands;
         
-        // Update scores from the top down based on spacing.        
+        // Update scores from the top down based on spacing.
         int mmsAbove = Rank.MAX_RANK.toMms();
         bands.get(0).setSpacing(0);
         
@@ -403,8 +417,13 @@ public class Tournament implements ITournament {
         }
     }
 
+    private int getMinBandMms() {
+        return bands.get( bands.size() - 1 ).getMms();
+    }
     
-    
+    private int getMaxBandMms() {
+        return bands.get( 0 ).getMms();
+    }
     
     
     
@@ -530,6 +549,7 @@ public class Tournament implements ITournament {
     @Override
     public ArrayList<Game> pairRound( ArrayList<Player> players, int roundIndex ) {
         if (players.size() % 2 != 0) {
+            Logger.getLogger( Tournament.class.getName() ).log( Level.INFO, "Attempted to pair an odd number of players. Bye player should have been removed before this call." );
             
             return null;
         }
@@ -537,13 +557,20 @@ public class Tournament implements ITournament {
         // Get alPreviousGames
         ArrayList<Game> alPreviousGames = getGamesBefore(roundIndex);
         
-        int mainScoreMin = 0;
-        int mainScoreMax = roundIndex;
+        
         PlacementCriterion mainCrit = placementProps.mainCriterion();
-        if ( mainCrit == PlacementCriterion.MMS ) {
-            mainScoreMin = pairingProps.getMMFloor().toMms();
-            mainScoreMax = pairingProps.getMMBar().toMms() + roundIndex;
-            
+        
+        int mainScoreMin;
+        int mainScoreMax;
+        switch (mainCrit) {
+            case MMS:
+                mainScoreMin = getMinBandMms();
+                mainScoreMax = getMaxBandMms() + roundIndex;
+                break;
+            case NBW:
+            default:
+                mainScoreMin = 0;
+                mainScoreMax = roundIndex;
         }
         
         
@@ -648,6 +675,16 @@ public class Tournament implements ITournament {
         }
         return gL;
     }
+    
+    @Override
+    public Game getGame( int roundIndex, Player p ) {
+        ArrayList<Game> games = getGames( roundIndex );
+        for ( Game game : games ) {
+            if (game.playersInclude(p)) { return game; }
+        }
+        return null;
+    }
+    
 
     /*
      * Inserts games loaded by save file parser. First scores players for the 

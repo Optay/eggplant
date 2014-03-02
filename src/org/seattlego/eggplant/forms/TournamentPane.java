@@ -4,11 +4,14 @@
  */
 package org.seattlego.eggplant.forms;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.seattlego.eggplant.Eggplant;
+import org.seattlego.eggplant.interfaces.ITournament;
 import org.seattlego.eggplant.io.ReportGenerator;
 import org.seattlego.eggplant.io.XmlEncoderAGA;
 
@@ -41,6 +44,22 @@ public class TournamentPane extends EggplantForm {
         
     }
 
+    @Override
+    public void setTournament( ITournament tourney ) {
+        
+        tourney.addIdChangeListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateControls();
+            }
+            
+        } );
+        
+        
+        super.setTournament( tourney );
+    }
+    
     
     private boolean saveTournament() {
         if ( Eggplant.lastSaveFile != null) {
@@ -75,7 +94,8 @@ public class TournamentPane extends EggplantForm {
         FileNameExtensionFilter filter = new FileNameExtensionFilter( "XML Tournament", "xml" );
         fileChoice.setFileFilter(filter);
         
-        int result = fileChoice.showOpenDialog(this);
+        
+        int result = fileChoice.showOpenDialog( this );
         if (result == JFileChooser.CANCEL_OPTION) {
             return;
         }
@@ -162,7 +182,6 @@ public class TournamentPane extends EggplantForm {
         jLabel4 = new javax.swing.JLabel();
         labelText = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(900, 100));
 
@@ -250,10 +269,7 @@ public class TournamentPane extends EggplantForm {
         labelText.setText("jLabel5");
         labelText.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/seattlego/eggplant/assets/icon16.png"))); // NOI18N
-
-        jLabel1.setFont(new java.awt.Font("Tachyon", 0, 24)); // NOI18N
-        jLabel1.setText("Eggplant");
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/seattlego/eggplant/assets/logo.png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -264,8 +280,6 @@ public class TournamentPane extends EggplantForm {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(labelText, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -278,7 +292,7 @@ public class TournamentPane extends EggplantForm {
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 453, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -288,11 +302,9 @@ public class TournamentPane extends EggplantForm {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel5)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel1)
-                                .addComponent(labelText)))
+                            .addComponent(labelText))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -338,7 +350,6 @@ public class TournamentPane extends EggplantForm {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton6;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

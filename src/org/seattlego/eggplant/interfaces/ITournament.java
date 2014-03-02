@@ -1,5 +1,6 @@
 package org.seattlego.eggplant.interfaces;
 
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import org.seattlego.eggplant.model.*;
 
@@ -11,6 +12,9 @@ public interface ITournament {
     public boolean addPlayer( Player p );
     public boolean removePlayer( Player p );
     public boolean addLoadedPlayers( ArrayList<Player> loadedPlayers );
+    
+    public void addIdChangeListener( ActionListener l );
+    public void fireIdChange();
     
     public ArrayList<Player> getRegisteredPlayers();
     
@@ -45,8 +49,10 @@ public interface ITournament {
     
     
     public ArrayList<Game> pairRound( ArrayList<Player> players, int roundIndex );
+    
     public ArrayList<Game> getGamesBefore( int roundIndex );
     public ArrayList<Game> getGames( int roundIndex );
+    public Game getGame( int roundIndex, Player p );
     public void removeGame( Game game );
     public void addLoadedGames( int roundIndex, ArrayList<Game> newGames );
     

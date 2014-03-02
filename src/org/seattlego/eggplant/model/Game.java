@@ -219,13 +219,17 @@ public class Game {
             return getWhitePlayer();
         }
     }
-    
-    public int getResultValueFor( Player p ) {
+
+    public PlayerResult getResultFor( Player p ) {
         if ( getWhitePlayer() == p ) {
-            return getResult().getWhiteResult().getValue();
+            return getResult().getWhiteResult();
         } else {
-            return getResult().getBlackResult().getValue();
+            return getResult().getBlackResult();
         }
+    }
+
+    public int getResultValueFor( Player p ) {
+        return getResultFor( p ).getValue();
     }
     
     

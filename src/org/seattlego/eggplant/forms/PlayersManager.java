@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -466,6 +467,7 @@ public class PlayersManager extends EggplantForm {
                 // It worked, sync the observable list for the players table.
                 registeredPlayers.add( selectedPlayer );
                 resetPlayerDetails();
+                updateRegisteredCount();
             } else {
                 // It didn't work: report the problem, leave form as is.
                 JOptionPane.showMessageDialog( this, "Unable to add player.", "Alert", JOptionPane.INFORMATION_MESSAGE );
@@ -485,6 +487,7 @@ public class PlayersManager extends EggplantForm {
             // It worked, sync the observable list for the players table.
             registeredPlayers.remove( selectedPlayer );
             resetPlayerDetails();
+            updateRegisteredCount();
         } else {
             JOptionPane.showMessageDialog( this, "Player cannot be removed. Player is involved in a game or is the bye player for a round.", "Message", JOptionPane.ERROR_MESSAGE );
         }
@@ -505,12 +508,25 @@ public class PlayersManager extends EggplantForm {
         }
     }
     
+    private void updateRegisteredCount() {
+        TitledBorder titledBorder = (TitledBorder) jPanel3.getBorder();
+        titledBorder.setTitle("Registered Players (" + Integer.toString( registeredPlayers.size() ) + ")");
+        jPanel3.repaint();
+        
+        //Logger.getLogger( PlayersManager.class.getName() ).log( Level.INFO, Integer.toString( registeredPlayers.size() ) );
+        
+    }
+    
     @Override
     protected void updateControls() {
+        
         if ( tournament != null ) {
             registeredPlayers.clear();
-            registeredPlayers.addAll( ObservableCollections.observableList( tournament.getRegisteredPlayers() ) );
+            //registeredPlayers.addAll( ObservableCollections.observableList( tournament.getRegisteredPlayers() ) );
+            registeredPlayers.addAll( tournament.getRegisteredPlayers() );
         }
+        
+        updateRegisteredCount();
         resetPlayerDetails();
     }
     

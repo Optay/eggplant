@@ -156,6 +156,14 @@ public class PairingsManager extends EggplantForm {
             }
         });
         
+        TableRowSorter trsGames = new TableRowSorter( tblGames.getModel() );
+        // TODO - EEK! Hardcoded column numbers. For shame... Find these columns by name perhaps.
+        tblGames.setRowSorter( trsGames );
+        
+        RowSorter.SortKey defaultTableSort = new RowSorter.SortKey( 0 , SortOrder.ASCENDING );
+        trsGames.setSortKeys( Arrays.asList( defaultTableSort ) );
+        
+        
         //
         
         
@@ -369,8 +377,6 @@ public class PairingsManager extends EggplantForm {
                 return canEdit [columnIndex];
             }
         });
-        tblPairablePlayers.setCellSelectionEnabled(false);
-        tblPairablePlayers.setRowSelectionAllowed(true);
         tblPairablePlayers.getTableHeader().setReorderingAllowed(false);
         scpPairablePlayers.setViewportView(tblPairablePlayers);
         tblPairablePlayers.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -399,8 +405,6 @@ public class PairingsManager extends EggplantForm {
                 return types [columnIndex];
             }
         });
-        tblUnpairablePlayers.setCellSelectionEnabled(false);
-        tblUnpairablePlayers.setRowSelectionAllowed(true);
         tblUnpairablePlayers.getTableHeader().setReorderingAllowed(false);
         scpUnairablePlayers.setViewportView(tblUnpairablePlayers);
         tblUnpairablePlayers.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -438,13 +442,13 @@ public class PairingsManager extends EggplantForm {
                     .addComponent(txfNbPairablePlayers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scpPairablePlayers, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(scpPairablePlayers, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlPlayersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txfNbUnpairablePlayers, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scpUnairablePlayers, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                .addComponent(scpUnairablePlayers, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -690,7 +694,7 @@ public class PairingsManager extends EggplantForm {
                 JOptionPane.showMessageDialog(this, "Please select an even number of players.", "Message", JOptionPane.ERROR_MESSAGE);
                 return;
             } else {
-                int response = JOptionPane.showConfirmDialog(this, "An odd number of players are selected. Allow Eggplant to select a bye player automatically?", "Query", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
+                int response = JOptionPane.showConfirmDialog(this, "An odd number of players are selected. Allow Eggplant to select a bye player automatically?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
                 if (response == JOptionPane.YES_OPTION) {
                     tournament.chooseByePlayer( playersToPair, roundIndex );
                     byePlayer = tournament.getByePlayer(roundIndex);
