@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -162,6 +161,7 @@ public class TemplateManager {
         eggplant.appendChild( XmlUtils.CreateElement( document, "numberofrounds", Integer.toString( tournament.getPairingProps().getNumberOfRounds() ) ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "mmbar", tournament.getPairingProps().getMMBar().toString() ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "mmfloor", tournament.getPairingProps().getMMFloor().toString() ) );
+        eggplant.appendChild( XmlUtils.CreateElement( document, "bandspacingscheme", tournament.getPairingProps().getBandSpacingScheme().name() ) );
         
         eggplant.appendChild( XmlUtils.CreateElement( document, "lastroundforseedsystem", Integer.toString( tournament.getPairingProps().getLastRoundForSeedSystem1() ) ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "pairingscheme1", tournament.getPairingProps().getPairingScheme1().name() ) );
@@ -273,6 +273,8 @@ public class TemplateManager {
         tournament.getPairingProps().setNumberOfRounds( XmlUtils.GetTextContent( eggplant, "numberofrounds" ) );
         tournament.getPairingProps().setMMBar( XmlUtils.GetTextContent( eggplant, "mmbar") );
         tournament.getPairingProps().setMMFloor( XmlUtils.GetTextContent( eggplant, "mmfloor") );
+        try { tournament.getPairingProps().setBandSpacingScheme( BandSpacingScheme.valueOf( XmlUtils.GetTextContent( eggplant, "bandspacingscheme") ) ); }
+        catch (IllegalArgumentException ex) { tournament.getPairingProps().setBandSpacingScheme( BandSpacingScheme.STACKED ); }
         
         tournament.getPairingProps().setLastRoundForSeedSystem1( XmlUtils.GetTextContent( eggplant, "lastroundforseedsystem") );
         PairingMethod loadedPairingScheme1 = PairingMethod.valueOf( XmlUtils.GetTextContent( eggplant, "pairingscheme1") );

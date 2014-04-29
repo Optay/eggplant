@@ -116,7 +116,15 @@ public class BandTreeTransferHandler extends TransferHandler {
             for(int i = 0; i < nodesToRemove.length; i++) {
                 model.removeNodeFromParent(nodesToRemove[i]);
             }
-        }*/
+         }*/
+        
+        // Fire event to repopulate tree since underlying model has changed.
+        JTree tree = (JTree)source;
+        BandTreeModel model = (BandTreeModel)tree.getModel();
+        model.nodeChanged( (TreeNode) model.getRoot() );
+        
+        Logger.getLogger( BandTreeTransferHandler.class.getName() ).log( Level.INFO, "exportDone complete" );
+        
     }
 
     @Override
@@ -150,8 +158,6 @@ public class BandTreeTransferHandler extends TransferHandler {
         
         DefaultMutableTreeNode newParent = (DefaultMutableTreeNode)dest.getLastPathComponent();
         
-        JTree tree = (JTree)support.getComponent();
-        BandTreeModel model = (BandTreeModel)tree.getModel();
         
         Logger.getLogger( BandTreeTransferHandler.class.getName() ).log( Level.INFO, nodes.toString() );
         
@@ -172,9 +178,12 @@ public class BandTreeTransferHandler extends TransferHandler {
             
         }
         
-        // Fire a changed event, so that empty bands get cleaned up and tree
-        // gets repopulated. This full repopulation is perhaps a bit overkill.
-        model.nodeChanged( (TreeNode) model.getRoot() );
+//        JTree tree = (JTree)support.getComponent();
+//        BandTreeModel model = (BandTreeModel)tree.getModel();
+        //model.nodeChanged( (TreeNode) model.getRoot() );
+        
+        Logger.getLogger( BandTreeTransferHandler.class.getName() ).log( Level.INFO, "importData complete" );
+        
         
         return true;
     }

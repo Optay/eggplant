@@ -7,6 +7,8 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
@@ -277,7 +279,6 @@ public class CustomTablePrintable implements Printable {
     
     // Multi-line text draw
     private void printText(Graphics2D g, String text, Font font, int imgWidth) {
-        
         String[] lines = text.split("\n");
         
         g.setColor(Color.BLACK);

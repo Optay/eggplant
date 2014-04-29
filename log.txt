@@ -1,0 +1,8 @@
+Apr 28, 2014 11:55:20 AM org.seattlego.eggplant.model.Tournament addPlayer
+INFO: Player added
+Apr 28, 2014 11:55:53 AM org.seattlego.eggplant.model.Tournament addPlayer
+INFO: Player added
+Apr 28, 2014 11:59:17 AM org.seattlego.eggplant.model.Tournament addPlayer
+INFO: Player added
+Apr 28, 2014 12:00:01 PM org.seattlego.eggplant.model.Tournament addPlayer
+INFO: Player added

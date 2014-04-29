@@ -42,18 +42,18 @@ public interface ITournament {
     
     
     public ArrayList<Band> getBands();
-    public void createBands( int numberOfBands );
+    public void resetBands();
     public void updateBands();
-    public void modifyBandOffset( Band band, int newOffset );
+    public void splitBand( Band band );
     public int getBandOffset( Band band );
     
     
     public ArrayList<Game> pairRound( ArrayList<Player> players, int roundIndex );
+    public void unpairRound( ArrayList<Game> games, int roundIndex );
     
     public ArrayList<Game> getGamesBefore( int roundIndex );
     public ArrayList<Game> getGames( int roundIndex );
     public Game getGame( int roundIndex, Player p );
-    public void removeGame( Game game );
     public void addLoadedGames( int roundIndex, ArrayList<Game> newGames );
     
  

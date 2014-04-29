@@ -184,6 +184,7 @@ TournamentStaffList
         eggplant.appendChild( XmlUtils.CreateElement( document, "numberofrounds", Integer.toString( tournament.getPairingProps().getNumberOfRounds() ) ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "mmbar", tournament.getPairingProps().getMMBar().toString() ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "mmfloor", tournament.getPairingProps().getMMFloor().toString() ) );
+        eggplant.appendChild( XmlUtils.CreateElement( document, "bandspacingscheme", tournament.getPairingProps().getBandSpacingScheme().name() ) );
         
         eggplant.appendChild( XmlUtils.CreateElement( document, "lastroundforseedsystem", Integer.toString( tournament.getPairingProps().getLastRoundForSeedSystem1() ) ) );
         eggplant.appendChild( XmlUtils.CreateElement( document, "pairingscheme1", tournament.getPairingProps().getPairingScheme1().name() ) );
@@ -423,6 +424,16 @@ TournamentStaffList
             tournament.getPairingProps().setMMBar( XmlUtils.GetTextContent( eggplant, "mmbar") );
             tournament.getPairingProps().setMMFloor( XmlUtils.GetTextContent( eggplant, "mmfloor") );
             //
+            
+            try {
+                tournament.getPairingProps().setBandSpacingScheme( BandSpacingScheme.valueOf( XmlUtils.GetTextContent( eggplant, "bandspacingscheme") ) );
+            } catch ( IllegalArgumentException ex ) {
+                reportBuilder.append("\nInvalid band spacing scheme.");
+                
+                // Default to stacked as that was how things operated before this option existed.
+                tournament.getPairingProps().setBandSpacingScheme(BandSpacingScheme.STACKED);
+            }
+            
 
             try {
                 int lastRound = Integer.parseInt( XmlUtils.GetTextContent( eggplant, "lastroundforseedsystem" ) );
@@ -453,7 +464,7 @@ TournamentStaffList
             } catch ( IllegalArgumentException ex ) {
                 reportBuilder.append("\nInvalid handicap basis.");
             }
-                
+            
             try {
                 int loadedHandicapModifier = Integer.parseInt( XmlUtils.GetTextContent( eggplant, "handicapmodifier") );
                 tournament.getPairingProps().setHandicapModifier( loadedHandicapModifier );

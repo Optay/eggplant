@@ -72,7 +72,7 @@ public class TournamentPane extends EggplantForm {
     private boolean saveTournamentAs() {
         JFileChooser fileChoice = new ConfirmingFileChooser( Eggplant.lastSaveFolder, "XML Tournament", "xml" );
         
-        int result = fileChoice.showSaveDialog(this);
+        int result = fileChoice.showSaveDialog(Eggplant.getInstance().getMainWindow());
         if (result == JFileChooser.CANCEL_OPTION) {
             return false;
         }
@@ -95,7 +95,7 @@ public class TournamentPane extends EggplantForm {
         fileChoice.setFileFilter(filter);
         
         
-        int result = fileChoice.showOpenDialog( this );
+        int result = fileChoice.showOpenDialog( Eggplant.getInstance().getMainWindow() );
         if (result == JFileChooser.CANCEL_OPTION) {
             return;
         }
@@ -106,14 +106,14 @@ public class TournamentPane extends EggplantForm {
         
         String report = XmlEncoderAGA.getLoadReport();
         if ( !report.equals("") ) {
-            JOptionPane.showMessageDialog( this, report, "Note", JOptionPane.INFORMATION_MESSAGE );
+            JOptionPane.showMessageDialog( Eggplant.getInstance().getMainWindow(), report, "Note", JOptionPane.INFORMATION_MESSAGE );
         }
     }
     
     private void exportReport() {
         JFileChooser fileChoice = new ConfirmingFileChooser( Eggplant.lastExportFolder, "Report", "txt" );
         
-        int result = fileChoice.showSaveDialog(this);
+        int result = fileChoice.showSaveDialog(Eggplant.getInstance().getMainWindow());
         if (result == JFileChooser.CANCEL_OPTION) {
             return;
         }
@@ -150,7 +150,7 @@ public class TournamentPane extends EggplantForm {
             return true;
         }
 
-        int response = JOptionPane.showConfirmDialog(this, "Do you want to save the current tournament?", "Query", JOptionPane.YES_NO_CANCEL_OPTION);
+        int response = JOptionPane.showConfirmDialog(Eggplant.getInstance().getMainWindow(), "Do you want to save the current tournament?", "Query", JOptionPane.YES_NO_CANCEL_OPTION);
         if (response == JOptionPane.CANCEL_OPTION) {
             return false;
         }
@@ -404,7 +404,7 @@ public class TournamentPane extends EggplantForm {
             if (getDialogType() == SAVE_DIALOG) {
                 File selectedFile = getSelectedFile();
                 if ((selectedFile != null) && selectedFile.exists()) {
-                    int response = JOptionPane.showConfirmDialog(this,
+                    int response = JOptionPane.showConfirmDialog(Eggplant.getInstance().getMainWindow(),
                     "The file " + selectedFile.getName() + " already exists. Do you want to replace the existing file?",
                     "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
                     

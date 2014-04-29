@@ -84,18 +84,29 @@ public class RatingsList {
         return playersAvailable;
     }
     
-    public ArrayList<PlayerId> getPlayersAvailable( String filter ) {
-        int filterLength = filter.length();
+    public ArrayList<PlayerId> getPlayersAvailable( String filterText ) {
+        String[] filterWords = filterText.split(" ");
         
-        if ( filterLength == 0 ) { return playersAvailable; }
+        if ( (filterWords.length == 1) && (filterWords[0].length() == 0 ) ) {
+            return playersAvailable;
+        }
         
+        // Make a copy of the available players list and prune it as we go.
+        ArrayList<PlayerId> sourceList = (ArrayList) playersAvailable.clone();
         ArrayList<PlayerId> filteredList = new ArrayList<>();
         
-        
-        for ( PlayerId pId : playersAvailable ) {
-            if ( pId.getName().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
-            if ( pId.getFirstName().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
-            if ( pId.getAGANoString().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+        for ( String filter : filterWords ) {
+            int filterLength = filter.length();
+            if ( filterLength == 0 ) { continue; }
+            
+            filteredList = new ArrayList<>();
+            
+            for ( PlayerId pId : sourceList ) {
+                if ( pId.getName().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+                if ( pId.getFirstName().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+                if ( pId.getAGANoString().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+            }
+            sourceList = (ArrayList) filteredList.clone();;
         }
         
         return filteredList;

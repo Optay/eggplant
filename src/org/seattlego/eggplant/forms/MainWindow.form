@@ -118,8 +118,8 @@
         <Container class="javax.swing.JPanel" name="gamesPanel">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Games">
-                <Property name="tabTitle" type="java.lang.String" value="Games"/>
+              <JTabbedPaneConstraints tabName="Pairings">
+                <Property name="tabTitle" type="java.lang.String" value="Pairings"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

@@ -35,6 +35,18 @@ public class Player {
     public void setParticipation( int roundIndex, Participation newParticipation ){
         participation[roundIndex] = newParticipation;
     }
+    /**
+     * Change a player's participation for a range of rounds.
+     * 
+     * @param roundIndexStart
+     * @param roundIndexEnd
+     * @param newParticipation 
+     */
+    public void setParticipation( int roundIndexStart, int roundIndexEnd, Participation newParticipation ){
+        for ( int roundIndex = roundIndexStart; roundIndex <= roundIndexEnd; roundIndex++ ) {
+            participation[roundIndex] = newParticipation;
+        }
+    }
     
     public Rank getRank() {
         return rank;

@@ -4,6 +4,7 @@
  */
 package org.seattlego.eggplant;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -72,8 +73,13 @@ public class Eggplant {
         tournament.setChangedSinceLastSave( false );
     }
     
-    
-    
+    /**
+     * 
+     * @return Reference to main window for dialog placement.
+     */
+    public Component getMainWindow() {
+        return mainWindow;
+    }
     
     
     

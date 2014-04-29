@@ -53,9 +53,6 @@ public class Tournament implements ITournament {
         gamesMap = new HashMap<>();
         
         bands = new ArrayList<>();
-        // Add a starting band
-        bands.add( new Band("Band", Rank.MAX_RANK.toMms(), 0 ));
-        
         
         props = new TournamentProperties();
         pairingProps = new PairingProperties();
@@ -119,7 +116,9 @@ public class Tournament implements ITournament {
     
     @Override
     public String getPrintHeadingString( String title ) {
-        return MessageFormat.format( "{0} \u0077 {1}\n{2}", getProps().getName(), getProps().getStartDateString(), title );
+        
+        return MessageFormat.format( "{0} -- {1}\n{2}", getProps().getName(), getProps().getStartDateString(), title );
+        //return MessageFormat.format( "{0} \u2013 {1}\n{2}", getProps().getName(), getProps().getStartDateString(), title );
         
     }
     
@@ -153,7 +152,7 @@ public class Tournament implements ITournament {
         playersMap.put( p.getKeyString(), p );
         
         // Find closest band
-        assignPlayerToClosestBand( p );
+        assignPlayerToBand( p );
         //
         
         
@@ -189,7 +188,7 @@ public class Tournament implements ITournament {
                 }
             }
             if ( playerBand == null ) {
-                playerBand = new Band( "Foo", bandMms );
+                playerBand = new Band( bandMms );
                 bands.add( playerBand );
             }
             playerBand.addPlayer( p );
@@ -198,10 +197,7 @@ public class Tournament implements ITournament {
         // Sort bands.
         Collections.sort( bands, new BandComparator() );
         
-        updateBandSpacing();
-        
-        // Called just to update band names as MMSs will already be correct.
-        updateBands();
+        updateBandSpacings();
         
         return true;  
     }
@@ -215,9 +211,19 @@ public class Tournament implements ITournament {
             return false;
         }
         
+        // Remove from player list.
         if ( playersMap.remove( p.getKeyString() ) == null ) {
             // Null player or player was not registered.
             return false;
+        }
+        
+        // Keep bands in sync.
+        for ( Band band : bands ) {
+            if ( band.getPlayers().contains( p ) ) {
+                band.removePlayer(p);
+                updateBands();
+                break;
+            }
         }
         
         setChangedSinceLastSave(true);
@@ -274,7 +280,9 @@ public class Tournament implements ITournament {
     
     
     /*
-     * Assign band values and names.
+     * Sweep bands and correct values/spacing based on banding scheme.
+     * 
+     * 
      */
     @Override
     public void updateBands() {
@@ -287,96 +295,117 @@ public class Tournament implements ITournament {
         
         bands = nonEmptyBands;
         
-        // Update scores from the top down based on spacing.
+        
+        if ( pairingProps.getBandSpacingScheme() == BandSpacingScheme.SPACED ) {
+            updateBandSpacings();
+        } else if ( pairingProps.getBandSpacingScheme() == BandSpacingScheme.STACKED ) {
+            updateBandScores();
+        }
+    }
+    
+    /*
+     * Sweep bands and update their scores based on spacing.
+     */
+    private void updateBandScores() {
         int mmsAbove = Rank.MAX_RANK.toMms();
+        int baseMms = bands.get(0).getMms();
+        
         bands.get(0).setSpacing(0);
         
-        int nameCounter = 65;
         for ( Band band : bands ) {
             band.setMms( mmsAbove - band.getSpacing() );
-            band.setLabel( "Band " + Character.toString( (char) nameCounter) + ": " + Integer.toString( getBandOffset(band) ));
-            
-            nameCounter++;
             mmsAbove = band.getMms();
+            
+            band.setOffset( band.getMms() - baseMms );
         }
+        // Restore spacing for initial band in case a new band is added above it.
+        bands.get(0).setSpacing(1);
+        
+        
+        setScoringValidity( false );
+        setChangedSinceLastSave(true);
+    }
+    
+    /*
+     * Sweep bands and update their spacing based on their values.
+     */
+    private void updateBandSpacings() {
+        int mmsAbove = bands.get(0).getMms();
+        int baseMms = bands.get(0).getMms();
+        for ( Band band : bands ) {
+            band.setSpacing( mmsAbove - band.getMms() );
+            mmsAbove = band.getMms();
+            
+            band.setOffset( band.getMms() - baseMms );
+        }
+        
         setScoringValidity( false );
         setChangedSinceLastSave(true);
     }
     
     @Override
-    public void createBands( int playersPerBand ) {
-        bands.clear();
-        
-        if ( playersPerBand < 1 ) { playersPerBand = 1; }
-        
-        // Create and assign bar and floor bands
-        Band topBand = new Band("", 0, 1 );
-        Band bottomBand = new Band("", 0, 1 );
-
-        ArrayList<Player> players = getRegisteredPlayers();
-        for ( Player p : players ) {
-            if ( p.getRank().toMms() >= pairingProps.getMMBar().toMms() ) {
-                topBand.addPlayer( p );
-                continue;
-            }
-            if ( p.getRank().toMms() <= pairingProps.getMMFloor().toMms() ) {
-                bottomBand.addPlayer( p );
-                continue;
-            }
+    public void resetBands() {
+        bands = new ArrayList<>();
+        for ( Player p : playersMap.values() ) {
+            assignPlayerToBand( p );
         }
-        //
-        
-        players.removeAll( topBand.getPlayers() );
-        players.removeAll( bottomBand.getPlayers() );
-        
-        Collections.sort( players, new PlayerComparator( new PlacementCriterion[]{ PlacementCriterion.RANK }, 1, false ) );
-        
-        // Add bands
-        int numberOfBands = Math.max( 1, Math.round( players.size()/playersPerBand ) );
-        for ( int i = 0; i < numberOfBands; i++ ) {
-            bands.add( new Band("", 0, 1) );
-        }
-        
-        // Add players to bands
-        for ( int i = 0; i < players.size(); i++ ) {
-            int bandIndex = Math.min( (int) i / playersPerBand, bands.size()-1 );
-            bands.get( bandIndex ).addPlayer( players.get(i) );
-        }
-        
-        // Assemble all the bands, update names and values.
-        bands.add( 0, topBand );
-        bands.add( bottomBand );
-        updateBands();
     }
     
     /*
-     * Warning, this method does NOT remove previous band assignment. This 
-     * should only be called when adding a new player that is not currently 
-     * found in any band's collection.
+     * Find the band that this player belongs in or create it if it does not
+     * exist.
+     * 
      * 
      */
-    private void assignPlayerToClosestBand( Player player ) {
+    private void assignPlayerToBand( Player player ) {
         
-        int minDistance = Integer.MAX_VALUE;
         Band oldBand = null;
-        Band closestBand = bands.get(0);
+        Band assignedBand = null;
+        int insertionPoint = -1;
         for ( Band b : bands ) {
-            for ( Player otherPlayer : b.getPlayers() ) {
-                if ( otherPlayer == player ) {
+            int compareMax = player.getRank().compareTo( b.getMaxRank() );
+            int compareMin = player.getRank().compareTo( b.getMinRank() );
+            if ( (compareMax<=0) && (compareMin>=0) ) {
+                assignedBand = b;
+            }
+            
+            if ( (insertionPoint == -1 ) && ( compareMax > 0 ) ) {
+                insertionPoint = bands.indexOf(b);
+            }
+            
+            // Check that player is not already in a band to prevent double-booking.
+            if ( oldBand == null ) {
+                if ( b.getPlayers().contains( player ) ) {
                     oldBand = b;
-                    continue;
-                }
-                int distance = Math.abs( player.getRank().getValue() - otherPlayer.getRank().getValue() );
-                if ( distance < minDistance ) {
-                    minDistance = distance;
-                    closestBand = b;
+                    break;
                 }
             }
         }
         if ( oldBand != null ) {
             oldBand.removePlayer( player );
         }
-        closestBand.addPlayer( player );
+        if ( insertionPoint == -1 ) {
+            insertionPoint = bands.size();  // Put the new one at the end
+        }
+        if ( assignedBand == null ) {
+            // Create bar/floor or normal mutable band.
+            if ( player.getRank().compareTo( pairingProps.getMMBar() ) >= 0 ) {
+                assignedBand = new Band("Bar", pairingProps.getMMBar().toMms(), pairingProps.getMMBar(), Rank.MAX_RANK);
+                insertionPoint = 0;
+            } else if ( player.getRank().compareTo( pairingProps.getMMFloor() ) <= 0 ) {
+                assignedBand = new Band("Floor", pairingProps.getMMFloor().toMms(), Rank.MIN_RANK, pairingProps.getMMFloor() );
+                insertionPoint = bands.size();
+            } else {
+                assignedBand = new Band( player.getRank().toMms() );
+            }
+            // The use of insertionPoint ensures bands are correctly ordered.
+            bands.add( insertionPoint, assignedBand );
+        }
+        assignedBand.addPlayer( player );
+        
+        // Clear empty and update band scores/spacing
+        updateBands();
+        
         setChangedSinceLastSave(true);
     }
     
@@ -387,18 +416,26 @@ public class Tournament implements ITournament {
     }
     
     @Override
-    public void modifyBandOffset( Band band, int newOffset ) {
-        if ( newOffset >= 0 ) {
+    public void splitBand( Band band ) {
+        if ( band.getPlayers().size() < 2 ) {
             return;
         }
-        int baseMms = bands.get(0).getMms();
+        Band newBand = new Band( band.getMms() );
         
-        band.setMms( baseMms + newOffset );
+        ArrayList<Player> movingPlayers = new ArrayList<>();
+        int playersCount = band.getPlayers().size();
+        for ( int playerIndex = (playersCount/2); playerIndex < playersCount; playerIndex ++ ) {
+            movingPlayers.add( band.getPlayers().get(playerIndex));
+        }
         
-        Collections.sort( bands, new BandComparator() );
+        for ( Player movingPlayer : movingPlayers ) {
+            band.removePlayer( movingPlayer );
+            newBand.addPlayer( movingPlayer );
+        }
         
-        updateBandSpacing();
-        updateBands();  // For names.
+        bands.add( bands.indexOf(band) + 1, newBand );
+        
+        updateBandScores();
     }
     
     @Override
@@ -406,16 +443,6 @@ public class Tournament implements ITournament {
         return bands;
     }
     
-    /*
-     * Sweep bands and update their spacing based on their values.
-     */
-    private void updateBandSpacing() {
-        int mmsAbove = bands.get(0).getMms();
-        for ( Band b : bands ) {
-            b.setSpacing( mmsAbove - b.getMms() );
-            mmsAbove = b.getMms();
-        }
-    }
 
     private int getMinBandMms() {
         return bands.get( bands.size() - 1 ).getMms();
@@ -703,18 +730,23 @@ public class Tournament implements ITournament {
     /*
      * Sorts all games in a round and renumbers them based on an MMS sort. Then
      * adds them to game map.
-     * 
      */
     private void addGames( int roundIndex, ArrayList<Game> newGames ) {
         // If we only renumber tables after pairing, this should never be necessary.
         //fillBaseScoringInfoIfNecessary();
         
+        /*
+         * Calling this method without any new games will set table numbers.
+         * This is necessary when REMOVING a game.
         if ( (newGames == null) || newGames.isEmpty() ) {
             return;
         }
+        */
         
         ArrayList<Game> games = getGames( roundIndex );
-        games.addAll( newGames );
+        if ( (newGames != null) && !newGames.isEmpty() ) {
+            games.addAll( newGames );
+        }
         
         Collections.sort( games, new GameComparator(GameComparator.BEST_MMS_ORDER) );
 
@@ -737,7 +769,6 @@ public class Tournament implements ITournament {
     private void addGame( Game g ) {
         // TODO - error check
         gamesMap.put( getGameKey( g ), g );
-        setChangedSinceLastSave( true );
         
         g.getWhitePlayer().setParticipation( g.getRoundIndex(), Participation.PAIRED );
         g.getBlackPlayer().setParticipation( g.getRoundIndex(), Participation.PAIRED );
@@ -746,7 +777,15 @@ public class Tournament implements ITournament {
     }
     
     @Override
-    public void removeGame( Game g ) {
+    public void unpairRound( ArrayList<Game> games, int roundIndex ) {
+        for(Game game : games ) {
+            removeGame( game );
+        }
+        addGames( roundIndex, null );
+        
+    }
+    
+    private void removeGame( Game g ) {
         // TODO - error check
         gamesMap.remove( getGameKey( g ) );
         

@@ -11,6 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import org.seattlego.eggplant.model.Band;
+import org.seattlego.eggplant.model.BandSpacingScheme;
 import org.seattlego.eggplant.model.BandTreeModel;
 import org.seattlego.eggplant.model.BandTreeTransferHandler;
 
@@ -82,13 +83,17 @@ public class Bands extends EggplantForm {
         jTree1.revalidate();
         * 
         */
-        updateBandProperties();
+        if ( tournament.getPairingProps().getBandSpacingScheme() == BandSpacingScheme.STACKED ) {
+            modifyBandPanel.setVisible(true);
+        } else {
+            modifyBandPanel.setVisible(false);
+        }
         
-        tfMMBar.setText( tournament.getPairingProps().getMMBar().toString() );
-        tfMMFloor.setText( tournament.getPairingProps().getMMFloor().toString() );
+        
         
         populateTree();
         
+        updateBandProperties();
     }
     
     private void updateBandProperties() {
@@ -109,13 +114,13 @@ public class Bands extends EggplantForm {
         setEnabledBandPropertiesControls( true );
         selectedBand = (Band) selectedNode.getUserObject();
         
-        jTextField1.setText( Integer.toString( tournament.getBandOffset( selectedBand ) ) );
+        jTextField1.setText( Integer.toString( selectedBand.getOffset() ) );
         jTextField2.setText( Integer.toString( selectedBand.getSpacing() ) );
         
     }
     
     private void setEnabledBandPropertiesControls( boolean enabled ) {
-        for ( Component c : jPanel2.getComponents() ) {
+        for ( Component c : modifyBandPanel.getComponents() ) {
             c.setEnabled( enabled );
         }
     }
@@ -136,13 +141,6 @@ public class Bands extends EggplantForm {
         
     }
     
-    private void modifyBandOffset( int newValue ) {
-        if ( selectedBand == null ) {
-            return;
-        }
-        tournament.modifyBandOffset( selectedBand, newValue );
-        updateBandProperties();
-    }
     private void modifyBandSpacing( int amount ) {
         if ( selectedBand == null ) {
             return;
@@ -170,6 +168,7 @@ public class Bands extends EggplantForm {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bandStyleButtonGroup = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new JTree() {
             protected void setExpandedState(TreePath path, boolean state) {
@@ -179,21 +178,15 @@ public class Bands extends EggplantForm {
                 }
             }
         };
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        lblMMBar2 = new javax.swing.JLabel();
-        lblMMFloor2 = new javax.swing.JLabel();
-        tfMMBar = new javax.swing.JTextField();
-        tfMMFloor = new javax.swing.JTextField();
-        jSpinner1 = new javax.swing.JSpinner();
-        jButton1 = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        modifyBandPanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
         jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
@@ -202,117 +195,26 @@ public class Bands extends EggplantForm {
         jTree1.setToggleClickCount(0);
         jScrollPane1.setViewportView(jTree1);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Automatic Banding"));
-        jPanel1.setToolTipText("");
-
-        jLabel1.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel1.setLabelFor(jSpinner1);
-        jLabel1.setText("Player per band");
-        jLabel1.setToolTipText("Target number of players in each band.");
-
-        lblMMBar2.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
-        lblMMBar2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblMMBar2.setLabelFor(tfMMBar);
-        lblMMBar2.setText("McMahon Bar");
-        lblMMBar2.setToolTipText("Players at or above this rank will all be in the same band. Accepts kyu/dan value: 1k, 20k, 5d.");
-
-        lblMMFloor2.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
-        lblMMFloor2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblMMFloor2.setLabelFor(tfMMFloor);
-        lblMMFloor2.setText("McMahon Floor");
-        lblMMFloor2.setToolTipText("Players at or below this rank will all be in the same band. Accepts kyu/dan value: 1k, 20k, 5d.");
-
-        tfMMBar.setToolTipText("");
-        tfMMBar.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tfMMBarFocusLost(evt);
-            }
-        });
-
-        tfMMFloor.setToolTipText("");
-        tfMMFloor.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                tfMMFloorFocusLost(evt);
-            }
-        });
-
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
-        jSpinner1.setToolTipText("");
-
-        jButton1.setText("Create Bands");
-        jButton1.setToolTipText("");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblMMFloor2, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblMMBar2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(tfMMFloor, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-                                .addComponent(tfMMBar, javax.swing.GroupLayout.Alignment.LEADING)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfMMBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblMMBar2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfMMFloor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblMMFloor2))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addContainerGap())
-        );
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Band Properties"));
+        modifyBandPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Modify Band"));
 
         jLabel3.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setLabelFor(jTextField1);
-        jLabel3.setText("MMS Offset");
+        jLabel3.setText("Score Offset");
         jLabel3.setToolTipText("The difference in score between this band and the topmost band.");
 
         jLabel4.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel4.setLabelFor(jTextField2);
         jLabel4.setText("Spacing");
         jLabel4.setToolTipText("The difference in score between this band and the next highest band.");
 
+        jTextField1.setEditable(false);
         jTextField1.setToolTipText("");
-        jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jTextField1FocusLost(evt);
-            }
-        });
 
         jTextField2.setToolTipText("");
 
-        jButton2.setText("Increase");
+        jButton2.setText("+");
         jButton2.setToolTipText("");
         jButton2.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -321,7 +223,7 @@ public class Bands extends EggplantForm {
             }
         });
 
-        jButton3.setText("Decrease");
+        jButton3.setText("-");
         jButton3.setToolTipText("");
         jButton3.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -330,42 +232,61 @@ public class Bands extends EggplantForm {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        jButton4.setText("Split");
+        jButton4.setToolTipText("");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout modifyBandPanelLayout = new javax.swing.GroupLayout(modifyBandPanel);
+        modifyBandPanel.setLayout(modifyBandPanelLayout);
+        modifyBandPanelLayout.setHorizontalGroup(
+            modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modifyBandPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addGroup(modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(modifyBandPanelLayout.createSequentialGroup()
+                        .addGroup(modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jTextField2)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(32, 32, 32)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        modifyBandPanelLayout.setVerticalGroup(
+            modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modifyBandPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel4)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(modifyBandPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addComponent(jButton4)
+                .addGap(31, 31, 31))
         );
+
+        jButton1.setText("Reset Bands");
+        jButton1.setToolTipText("");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -374,29 +295,30 @@ public class Bands extends EggplantForm {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(273, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(modifyBandPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(300, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(69, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 460, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(modifyBandPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(42, 42, 42))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        int numberOfBands = (int) jSpinner1.getValue();
-        tournament.createBands( numberOfBands );
+        tournament.resetBands();
         
         populateTree();
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -411,48 +333,33 @@ public class Bands extends EggplantForm {
         populateTree();
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void tfMMBarFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfMMBarFocusLost
-        tournament.getPairingProps().setMMBar(tfMMBar.getText());
-        tfMMBar.setText(tournament.getPairingProps().getMMBar().toString());
-        tournament.setChangedSinceLastSave(true);
-    }//GEN-LAST:event_tfMMBarFocusLost
-
-    private void tfMMFloorFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfMMFloorFocusLost
-        tournament.getPairingProps().setMMFloor(tfMMFloor.getText());
-        tfMMFloor.setText(tournament.getPairingProps().getMMFloor().toString());
-        tournament.setChangedSinceLastSave(true);
-    }//GEN-LAST:event_tfMMFloorFocusLost
-
-    private void jTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusLost
-        int newOffset;
-        try {
-            newOffset = Integer.parseInt( jTextField1.getText() );
-        } catch ( NumberFormatException ex ) {
-            updateBandProperties();
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // Split a band
+        if ( selectedBand == null ) {
             return;
         }
-        modifyBandOffset( newOffset );
+        
+        tournament.splitBand( selectedBand );
+        
+        updateBandProperties();
+        
         populateTree();
-    }//GEN-LAST:event_jTextField1FocusLost
+
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bandStyleButtonGroup;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTree jTree1;
-    private javax.swing.JLabel lblMMBar2;
-    private javax.swing.JLabel lblMMFloor2;
-    private javax.swing.JTextField tfMMBar;
-    private javax.swing.JTextField tfMMFloor;
+    private javax.swing.JPanel modifyBandPanel;
     // End of variables declaration//GEN-END:variables
 }
 

@@ -11,6 +11,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.seattlego.eggplant.Eggplant;
 import org.seattlego.eggplant.io.Template;
 import org.seattlego.eggplant.io.TemplateManager;
 import org.seattlego.eggplant.model.*;
@@ -49,6 +50,9 @@ public class TournamentSettings extends EggplantForm {
         CardLayout cl = (CardLayout) jPanel2.getLayout();
         cl.show( jPanel2, TimeSystem.CANADIAN.name() );
         
+        rdbBandSpacingSpaced.setActionCommand( BandSpacingScheme.SPACED.name() );
+        rdbBandSpacingStacked.setActionCommand( BandSpacingScheme.STACKED.name() );
+        
         handicapBasis0.setActionCommand( HandicapBasis.MMS.name() );
         handicapBasis1.setActionCommand( HandicapBasis.RANK.name() );
         
@@ -59,7 +63,6 @@ public class TournamentSettings extends EggplantForm {
         rdbLatterSplitAndFold.setActionCommand( PairingMethod.SPLIT_AND_FOLD.name() );
         rdbLatterSplitAndRandom.setActionCommand( PairingMethod.SPLIT_AND_RANDOM.name() );
         rdbLatterSplitAndSlip.setActionCommand( PairingMethod.SPLIT_AND_SLIP.name() );
-        
         
         rdbAbsentNbw0.setActionCommand("0");
         rdbAbsentNbw1.setActionCommand("1");
@@ -168,6 +171,7 @@ public class TournamentSettings extends EggplantForm {
         // pairing format - Only one, don't need to do anything right now.
         tfMMBar.setText( tournament.getPairingProps().getMMBar().toString() );
         tfMMFloor.setText( tournament.getPairingProps().getMMFloor().toString() );
+        setRadioSelection( bandSpacingButtonGroup, tournament.getPairingProps().getBandSpacingScheme().name() );
         txfLastRoundForSeedSystem1.setText( Integer.toString( tournament.getPairingProps().getLastRoundForSeedSystem1() ) );
         setRadioSelection( formerPairingScheme, tournament.getPairingProps().getPairingScheme1().name() );
         setRadioSelection( latterPairingScheme, tournament.getPairingProps().getPairingScheme2().name() );
@@ -281,6 +285,7 @@ public class TournamentSettings extends EggplantForm {
         handicapModifier = new javax.swing.ButtonGroup();
         formerPairingScheme = new javax.swing.ButtonGroup();
         latterPairingScheme = new javax.swing.ButtonGroup();
+        bandSpacingButtonGroup = new javax.swing.ButtonGroup();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
@@ -350,13 +355,14 @@ public class TournamentSettings extends EggplantForm {
         jLabel8 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jPanel3 = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jRadioButton8 = new javax.swing.JRadioButton();
         pnlMacMahon2 = new javax.swing.JPanel();
         lblMMBar2 = new javax.swing.JLabel();
         lblMMFloor2 = new javax.swing.JLabel();
         tfMMBar = new javax.swing.JTextField();
         tfMMFloor = new javax.swing.JTextField();
+        lblMMFloor3 = new javax.swing.JLabel();
+        rdbBandSpacingStacked = new javax.swing.JRadioButton();
+        rdbBandSpacingSpaced = new javax.swing.JRadioButton();
         pnlMain = new javax.swing.JPanel();
         pnlLatter = new javax.swing.JPanel();
         rdbLatterSplitAndRandom = new javax.swing.JRadioButton();
@@ -1123,20 +1129,7 @@ public class TournamentSettings extends EggplantForm {
 
         jTabbedPane1.addTab("Rules", jScrollPane10);
 
-        jLabel12.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
-        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel12.setText("Pairing format");
-
-        jRadioButton8.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
-        jRadioButton8.setSelected(true);
-        jRadioButton8.setText("McMahon");
-        jRadioButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton8ActionPerformed(evt);
-            }
-        });
-
-        pnlMacMahon2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "McMahon"));
+        pnlMacMahon2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Bands"));
 
         lblMMBar2.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
         lblMMBar2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -1158,23 +1151,56 @@ public class TournamentSettings extends EggplantForm {
             }
         });
 
+        lblMMFloor3.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        lblMMFloor3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblMMFloor3.setText("Band spacing");
+
+        bandSpacingButtonGroup.add(rdbBandSpacingStacked);
+        rdbBandSpacingStacked.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        rdbBandSpacingStacked.setText("Stacked");
+        rdbBandSpacingStacked.setToolTipText("For formal tournaments when winners are needed.");
+        rdbBandSpacingStacked.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        rdbBandSpacingStacked.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        rdbBandSpacingStacked.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbBandSpacingActionPerformed(evt);
+            }
+        });
+
+        bandSpacingButtonGroup.add(rdbBandSpacingSpaced);
+        rdbBandSpacingSpaced.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+        rdbBandSpacingSpaced.setText("Spaced");
+        rdbBandSpacingSpaced.setToolTipText("For informal play when low handicaps are preferred.");
+        rdbBandSpacingSpaced.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        rdbBandSpacingSpaced.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        rdbBandSpacingSpaced.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbBandSpacingActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlMacMahon2Layout = new javax.swing.GroupLayout(pnlMacMahon2);
         pnlMacMahon2.setLayout(pnlMacMahon2Layout);
         pnlMacMahon2Layout.setHorizontalGroup(
             pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMacMahon2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblMMBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblMMFloor2, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblMMFloor2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblMMBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblMMFloor3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rdbBandSpacingSpaced)
                     .addComponent(tfMMBar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfMMFloor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(tfMMFloor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbBandSpacingStacked))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlMacMahon2Layout.setVerticalGroup(
             pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMacMahon2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblMMBar2)
                     .addComponent(tfMMBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1182,7 +1208,13 @@ public class TournamentSettings extends EggplantForm {
                 .addGroup(pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblMMFloor2)
                     .addComponent(tfMMFloor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 12, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlMacMahon2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblMMFloor3)
+                    .addComponent(rdbBandSpacingStacked))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rdbBandSpacingSpaced)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pnlMain.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Pairing Scheme"));
@@ -1274,7 +1306,6 @@ public class TournamentSettings extends EggplantForm {
 
         formerPairingScheme.add(rdbFormerSplitAndRandom);
         rdbFormerSplitAndRandom.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
-        rdbFormerSplitAndRandom.setSelected(true);
         rdbFormerSplitAndRandom.setText("Split and Random");
         rdbFormerSplitAndRandom.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         rdbFormerSplitAndRandom.setMargin(new java.awt.Insets(0, 0, 0, 0));
@@ -1607,14 +1638,9 @@ public class TournamentSettings extends EggplantForm {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel12)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jRadioButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(pnlMacMahon2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(pnlMacMahon2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(pnlSpecialResults, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(104, Short.MAX_VALUE))
@@ -1623,14 +1649,9 @@ public class TournamentSettings extends EggplantForm {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel12)
-                            .addComponent(jRadioButton8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(pnlMacMahon2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(pnlSpecialResults, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(pnlSpecialResults, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                    .addComponent(pnlMacMahon2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(pnlMain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(32, Short.MAX_VALUE))
@@ -1694,7 +1715,7 @@ public class TournamentSettings extends EggplantForm {
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
-                .addGap(0, 9, Short.MAX_VALUE)
+                .addGap(0, 6, Short.MAX_VALUE)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel11Layout.createSequentialGroup()
                         .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1727,7 +1748,7 @@ public class TournamentSettings extends EggplantForm {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addContainerGap(89, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Templates", jPanel7);
@@ -1874,10 +1895,6 @@ public class TournamentSettings extends EggplantForm {
         tournament.setChangedSinceLastSave(true);
     }//GEN-LAST:event_tfBasicTimeFocusLost
 
-    private void jRadioButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton8ActionPerformed
-       // Since there is only one supported system, this button does nothing.
-    }//GEN-LAST:event_jRadioButton8ActionPerformed
-
     private void tfNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfNameFocusLost
         tournament.getProps().setName( tfName.getText() );
         tournament.setChangedSinceLastSave(true);
@@ -1925,13 +1942,13 @@ public class TournamentSettings extends EggplantForm {
     private void addTemplateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTemplateButtonActionPerformed
         String name = newTemplateName.getText();
         if ( name.equals("") ) {
-            JOptionPane.showMessageDialog(this, "Template must have a name.", "Message", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Template must have a name.", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         // Check for existing template and get confirmation.
         if ( TemplateManager.getTemplate( name ) != null ) {
-            int response = JOptionPane.showConfirmDialog( this, "Replace template " + name + " with current tournament settings?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            int response = JOptionPane.showConfirmDialog( Eggplant.getInstance().getMainWindow(), "Replace template " + name + " with current tournament settings?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if ( response != JOptionPane.YES_OPTION ) {
                 return;
             }
@@ -1949,7 +1966,7 @@ public class TournamentSettings extends EggplantForm {
     private void removeTemplateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeTemplateButtonActionPerformed
         String selectedTemplateName = (String) templateList2.getSelectedValue();
         if ( selectedTemplateName == null ) {
-            JOptionPane.showMessageDialog(this, "No template selected.", "Message", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "No template selected.", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -1962,21 +1979,28 @@ public class TournamentSettings extends EggplantForm {
     private void applyTemplateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyTemplateButtonActionPerformed
         String selectedTemplateName = (String) templateList1.getSelectedValue();
         if ( selectedTemplateName == null ) {
-            JOptionPane.showMessageDialog(this, "No template selected.", "Message", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "No template selected.", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        int response = JOptionPane.showConfirmDialog(this, "Applying a template will overwrite current tournament settings. Continue?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
+        int response = JOptionPane.showConfirmDialog(Eggplant.getInstance().getMainWindow(), "Applying a template will overwrite current tournament settings. Continue?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
         if (response == JOptionPane.YES_OPTION) {
             TemplateManager.applyTemplate( selectedTemplateName, tournament );
             updateControls();            
         }
     }//GEN-LAST:event_applyTemplateButtonActionPerformed
 
+    private void rdbBandSpacingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbBandSpacingActionPerformed
+        BandSpacingScheme newScheme = BandSpacingScheme.valueOf( bandSpacingButtonGroup.getSelection().getActionCommand() );
+        tournament.getPairingProps().setBandSpacingScheme( newScheme );
+        tournament.setChangedSinceLastSave(true);
+    }//GEN-LAST:event_rdbBandSpacingActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup absentMms;
     private javax.swing.ButtonGroup absentNbw;
     private javax.swing.JButton addTemplateButton;
     private javax.swing.JButton applyTemplateButton;
+    private javax.swing.ButtonGroup bandSpacingButtonGroup;
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.ButtonGroup byeMms;
     private javax.swing.ButtonGroup byeNbw;
@@ -1994,7 +2018,6 @@ public class TournamentSettings extends EggplantForm {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
@@ -2037,7 +2060,6 @@ public class TournamentSettings extends EggplantForm {
     private javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JRadioButton jRadioButton6;
     private javax.swing.JRadioButton jRadioButton7;
-    private javax.swing.JRadioButton jRadioButton8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;
@@ -2050,6 +2072,7 @@ public class TournamentSettings extends EggplantForm {
     private javax.swing.ButtonGroup latterPairingScheme;
     private javax.swing.JLabel lblMMBar2;
     private javax.swing.JLabel lblMMFloor2;
+    private javax.swing.JLabel lblMMFloor3;
     private javax.swing.JTextField maxHandicappedRankField;
     private javax.swing.JTextArea newTemplateDescription;
     private javax.swing.JTextField newTemplateName;
@@ -2072,6 +2095,8 @@ public class TournamentSettings extends EggplantForm {
     private javax.swing.JRadioButton rdbAbsentNbw3;
     private javax.swing.JRadioButton rdbAbsentNbw6;
     private javax.swing.JRadioButton rdbAbsentNbw9;
+    private javax.swing.JRadioButton rdbBandSpacingSpaced;
+    private javax.swing.JRadioButton rdbBandSpacingStacked;
     private javax.swing.JRadioButton rdbByeMms0;
     private javax.swing.JRadioButton rdbByeMms1;
     private javax.swing.JRadioButton rdbByeMms2;

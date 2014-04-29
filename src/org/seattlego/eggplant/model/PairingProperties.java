@@ -18,6 +18,8 @@ public class PairingProperties {
     private int numberOfRounds;
     private Rank MMFloor;
     private Rank MMBar;
+    private BandSpacingScheme bandSpacingScheme;
+    
     private PairingSystem pairingSystem;
     private boolean handicapGames;
 
@@ -33,14 +35,14 @@ public class PairingProperties {
      * with relative weight of this parameter (1/2)
      * MAX_DUPLICATE_GAME_COST should be strictly limited to 5 * 10^14
      **/ 
-    static final long MAX_DUPLICATE_GAME_COST = 500000000000000L;   // 5 * 10^14
+    static final long MAX_DUPLICATE_GAME_COST    = 500000000000000L;   // 5 * 10^14
     /**
      * Max value for random cost.
      * <br> Due to internal coding,
      * MAX_RANDOM_COST should be strictly limited to 2 * 10^9
      **/
-    static final long MAX_RANDOM_COST        =       1000000000L;   // 10^9
-    static final long MAX_COLOR_BALANCE_COST     =          1000000L;   // 10^6
+    static final long MAX_RANDOM_COST            = 1000000000L;   // 10^9
+    static final long MAX_COLOR_BALANCE_COST     = 1000000L;   // 10^6
 
     
     private long duplicateGameCost = MAX_DUPLICATE_GAME_COST;    
@@ -48,10 +50,10 @@ public class PairingProperties {
     private boolean isDeterministic = true;
     private long colorBalanceCost = MAX_COLOR_BALANCE_COST;
     
-    static final long MAX_CATEGORY_COST           =   20000000000000L;  // 2. 10^13
+    static final long MAX_CATEGORY_COST           = 20000000000000L;  // 2. 10^13
     // Ratio between MAX_SCORE_DIFFERENCE_COST and MAX_CATEGORY_COST should stay below 1/ nbcat^2
-    static final long MAX_SCORE_DIFFERENCE_COST         =     100000000000L;  // 10^11
-    static final long MAX_DUDD_WEIGHT                       =     MAX_SCORE_DIFFERENCE_COST / 1000;  // Draw-ups Draw-downs
+    static final long MAX_SCORE_DIFFERENCE_COST   = 100000000000L;  // 10^11
+    static final long MAX_DUDD_WEIGHT             = MAX_SCORE_DIFFERENCE_COST / 1000;  // Draw-ups Draw-downs
     
     // Enum?
     static final int  DUDD_TOP              = 1;
@@ -59,21 +61,21 @@ public class PairingProperties {
     static final int  DUDD_BOT              = 3;
     //
     
-    static final long MAX_MAXIMIZE_SEEDING_COST                  =         MAX_SCORE_DIFFERENCE_COST / 20000;
+    static final long MAX_MAXIMIZE_SEEDING_COST   = MAX_SCORE_DIFFERENCE_COST / 20000;
     
-    private long categoryCost             =     MAX_CATEGORY_COST;
+    private long categoryCost                     = MAX_CATEGORY_COST;
 
-    private long scoreDifferenceCost           =      MAX_SCORE_DIFFERENCE_COST;
+    private long scoreDifferenceCost              = MAX_SCORE_DIFFERENCE_COST;
 
-    private long duddWeight                        =          MAX_DUDD_WEIGHT;
-    private int duddUpperMode          = DUDD_MID;
-    private int duddLowerMode          = DUDD_MID;
+    private long duddWeight                       = MAX_DUDD_WEIGHT;
+    private int duddUpperMode                     = DUDD_MID;
+    private int duddLowerMode                     = DUDD_MID;
     
-    private long maximizeSeedingCost                   =         MAX_MAXIMIZE_SEEDING_COST;      // 5 *10^6
-    private int lastRoundForPairingScheme1            = 1;
+    private long maximizeSeedingCost              = MAX_MAXIMIZE_SEEDING_COST;      // 5 *10^6
+    private int lastRoundForPairingScheme1        = 1;
     
-    private PairingMethod pairingScheme1                = PairingMethod.SPLIT_AND_RANDOM;
-    private PairingMethod pairingScheme2                = PairingMethod.SPLIT_AND_FOLD;
+    private PairingMethod pairingScheme1          = PairingMethod.SPLIT_AND_RANDOM;
+    private PairingMethod pairingScheme2          = PairingMethod.SPLIT_AND_FOLD;
     
     /*
      * TODO - Fix when use is added.
@@ -82,9 +84,9 @@ public class PairingProperties {
       */
     
     // Make this a rank object?
-    private int secondaryCriteriaRankThreshold                           = 0;           // Do not apply secondary criteria above 1D rank
+    private int secondaryCriteriaRankThreshold    = 0;           // Do not apply secondary criteria above 1D rank
     
-    private boolean secondaryCriteriaWinThresholdActive               = true;        // Do not apply secondary criteria when nbWins >= nbRounds / 2
+    private boolean secondaryCriteriaWinThresholdActive = true;        // Do not apply secondary criteria when nbWins >= nbRounds / 2
     private long paiSeDefSecCrit;                            // Should be MAX_SCORE_DIFFERENCE_COST for MM, MAX_CATEGORY_COST for others
     private long minimizeHandicapCost;                      // Should be paiSeDefSecCrit for SwCat, 0 for others
     private long geoCost;                          // Should be paiSeDefSecCrit for SwCat and MM, 0 for Swiss
@@ -122,6 +124,7 @@ public class PairingProperties {
         numberOfRounds = DEFAULT_NUMBER_OF_ROUNDS;
         MMFloor = new Rank("30k");
         MMBar = new Rank("9d");
+        bandSpacingScheme = bandSpacingScheme.SPACED;
         pairingSystem = PairingSystem.MCMAHON;
 
         defaultKomi = DEFAULT_KOMI;
@@ -165,7 +168,12 @@ public class PairingProperties {
     public void setMMBar( String rankString){
         MMBar = new Rank( rankString );
     }
-    
+
+    public BandSpacingScheme getBandSpacingScheme() { return bandSpacingScheme; }
+    public void setBandSpacingScheme( BandSpacingScheme b ){
+        bandSpacingScheme = b;
+    }
+
     public PairingSystem getPairingSystem() { return pairingSystem; }
     public void setPairingSystem( PairingSystem p ) { pairingSystem = p; }
     

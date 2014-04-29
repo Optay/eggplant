@@ -16,6 +16,7 @@ import org.jdesktop.observablecollections.ObservableCollections;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.swingbinding.JTableBinding;
 import org.jdesktop.swingbinding.SwingBindings;
+import org.seattlego.eggplant.Eggplant;
 import org.seattlego.eggplant.model.Game;
 import org.seattlego.eggplant.model.Participation;
 import org.seattlego.eggplant.model.Player;
@@ -672,7 +673,7 @@ public class PairingsManager extends EggplantForm {
             
         } catch ( PrinterException ex ) {
             Logger.getLogger( PairingsManager.class.getName() ).log( Level.SEVERE, "Unable to print.\n" + ex );
-            JOptionPane.showMessageDialog(this, "Unable to print.", "Error", JOptionPane.ERROR_MESSAGE );
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Unable to print.", "Error", JOptionPane.ERROR_MESSAGE );
         }
         
         this.remove( scroll );
@@ -691,7 +692,7 @@ public class PairingsManager extends EggplantForm {
             byePlayer = tournament.getByePlayer( roundIndex );
             
             if ( byePlayer != null) {
-                JOptionPane.showMessageDialog(this, "Please select an even number of players.", "Message", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Please select an even number of players.", "Message", JOptionPane.ERROR_MESSAGE);
                 return;
             } else {
                 int response = JOptionPane.showConfirmDialog(this, "An odd number of players are selected. Allow Eggplant to select a bye player automatically?", "Query", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
@@ -745,7 +746,7 @@ public class PairingsManager extends EggplantForm {
         String alertMessage = alertBuilder.toString();
         
         if ( !alertMessage.equals("") ) {
-            JOptionPane.showMessageDialog(this, alertMessage, "Alert", JOptionPane.WARNING_MESSAGE );
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), alertMessage, "Alert", JOptionPane.WARNING_MESSAGE );
         }
 
     }//GEN-LAST:event_btnPairActionPerformed
@@ -755,7 +756,7 @@ public class PairingsManager extends EggplantForm {
 
         int nbGamesToRemove = alGamesToRemove.size();
         if (nbGamesToRemove > 1) {
-            int response = JOptionPane.showConfirmDialog(this,
+            int response = JOptionPane.showConfirmDialog(Eggplant.getInstance().getMainWindow(),
                     "Unpair " + nbGamesToRemove + " games?",
                     "Query",
                     JOptionPane.YES_NO_OPTION,
@@ -766,9 +767,7 @@ public class PairingsManager extends EggplantForm {
 
         }
         // And now, remove games from tournament
-        for (Game g : alGamesToRemove) {
-            tournament.removeGame(g);
-        }
+        tournament.unpairRound(alGamesToRemove, roundPane.getRoundIndex());
         
         tournament.setScoringValidity( false );
         
@@ -787,7 +786,7 @@ public class PairingsManager extends EggplantForm {
         if (selectedPlayers.isEmpty()) return;
         
         for ( Player p : selectedPlayers ) {
-            p.setParticipation( roundPane.getRoundIndex(), Participation.NOT_ASSIGNED );
+            p.setParticipation( roundPane.getRoundIndex(), tournament.getPairingProps().getNumberOfRounds() - 1, Participation.NOT_ASSIGNED );
         }
         updateControls();
         tournament.setChangedSinceLastSave(true);
@@ -799,7 +798,7 @@ public class PairingsManager extends EggplantForm {
         if (selectedPlayers.isEmpty()) return;
         
         for ( Player p : selectedPlayers ) {
-            p.setParticipation( roundPane.getRoundIndex(), Participation.ABSENT );
+            p.setParticipation( roundPane.getRoundIndex(), tournament.getPairingProps().getNumberOfRounds() - 1, Participation.ABSENT );
         }
         updateControls();
         tournament.setChangedSinceLastSave(true);

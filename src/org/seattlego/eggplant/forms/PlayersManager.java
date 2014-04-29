@@ -238,10 +238,10 @@ public class PlayersManager extends EggplantForm {
             //downloadBackground( strDefaultURL, fDefaultFile);
             //
         } catch (MalformedURLException ex) {
-            JOptionPane.showMessageDialog(this, "Malformed URL\nRating list could not be loaded", "Message", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Malformed URL\nRating list could not be loaded", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Unreachable file\nRating list could not be loaded", "Message", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Unreachable file\nRating list could not be loaded", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -249,7 +249,7 @@ public class PlayersManager extends EggplantForm {
     private void loadLocalFile() {
         File localFile = new File(Eggplant.rootFolder, "tdlista.txt" );
         if ( !localFile.exists() ) {
-            JOptionPane.showMessageDialog(this, "Ratings list not loaded. Unable to find 'tdlista.txt' in application folder.", "Message", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Ratings list not loaded. Unable to find 'tdlista.txt' in application folder.", "Message", JOptionPane.ERROR_MESSAGE);
         }  else {
             loadLocalFile( localFile );
         }
@@ -440,7 +440,7 @@ public class PlayersManager extends EggplantForm {
         
         
         if ( !isValid ) {
-            JOptionPane.showMessageDialog( this, errorMessage, "Alert", JOptionPane.INFORMATION_MESSAGE );
+            JOptionPane.showMessageDialog( Eggplant.getInstance().getMainWindow(), errorMessage, "Alert", JOptionPane.INFORMATION_MESSAGE );
         }
         
         return isValid;
@@ -453,11 +453,15 @@ public class PlayersManager extends EggplantForm {
         selectedPlayer.getId().setFirstName( tfFirstName.getText() );
         selectedPlayer.getId().setAGANo( tfAgaNo.getText() );
         
+        // Update participation only for rounds player is not involved in.
+        // Player may already be paired so should not be set back to NOT_ASSIGNED.
         for ( int round = 0; round<participationCheckBoxes.length; round++ ) {
-            if ( participationCheckBoxes[round].isSelected() ) {
-                selectedPlayer.setParticipation( round, Participation.NOT_ASSIGNED );
-            } else {
-                selectedPlayer.setParticipation( round, Participation.ABSENT );
+            if ( !tournament.playerInvolvedInRound( selectedPlayer, round ) ) {
+                if ( participationCheckBoxes[round].isSelected() ) {
+                    selectedPlayer.setParticipation( round, Participation.NOT_ASSIGNED );
+                } else {
+                    selectedPlayer.setParticipation( round, Participation.ABSENT );
+                }
             }
         }
         
@@ -470,7 +474,7 @@ public class PlayersManager extends EggplantForm {
                 updateRegisteredCount();
             } else {
                 // It didn't work: report the problem, leave form as is.
-                JOptionPane.showMessageDialog( this, "Unable to add player.", "Alert", JOptionPane.INFORMATION_MESSAGE );
+                JOptionPane.showMessageDialog( Eggplant.getInstance().getMainWindow(), "Unable to add player.", "Alert", JOptionPane.INFORMATION_MESSAGE );
             }
         } else
         {
@@ -489,7 +493,7 @@ public class PlayersManager extends EggplantForm {
             resetPlayerDetails();
             updateRegisteredCount();
         } else {
-            JOptionPane.showMessageDialog( this, "Player cannot be removed. Player is involved in a game or is the bye player for a round.", "Message", JOptionPane.ERROR_MESSAGE );
+            JOptionPane.showMessageDialog( Eggplant.getInstance().getMainWindow(), "Player cannot be removed. Player is involved in a game or is the bye player for a round.", "Message", JOptionPane.ERROR_MESSAGE );
         }
         
     }
@@ -1009,6 +1013,13 @@ public class PlayersManager extends EggplantForm {
         CustomPrintableTable printTable = new CustomPrintableTable( registeredPlayersTable.getModel() );
         JScrollPane scroll = new JScrollPane( printTable );
         
+        // Inherit sort
+        TableRowSorter printSorter = new TableRowSorter( printTable.getModel() );
+        printTable.setRowSorter( printSorter );
+        printSorter.setSortKeys( registeredPlayersTable.getRowSorter().getSortKeys() );
+        //
+        
+        
         printTable.getColumnModel().getColumn(0).setPreferredWidth( 400 );
         printTable.getColumnModel().getColumn(1).setPreferredWidth( 68 );
         
@@ -1023,7 +1034,7 @@ public class PlayersManager extends EggplantForm {
             
         } catch ( PrinterException ex ) {
             Logger.getLogger( PlayersManager.class.getName() ).log( Level.SEVERE, "Unable to print.\n" + ex );
-            JOptionPane.showMessageDialog(this, "Unable to print.", "Error", JOptionPane.ERROR_MESSAGE );
+            JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Unable to print.", "Error", JOptionPane.ERROR_MESSAGE );
         }
         
         this.remove( scroll );
@@ -1039,7 +1050,7 @@ public class PlayersManager extends EggplantForm {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         JFileChooser fileChoice = new JFileChooser( Eggplant.rootFolder );
         fileChoice.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        int result = fileChoice.showOpenDialog(this);
+        int result = fileChoice.showOpenDialog(Eggplant.getInstance().getMainWindow());
         if (result == JFileChooser.CANCEL_OPTION) {
             return;
         } else {

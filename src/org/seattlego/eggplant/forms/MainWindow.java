@@ -167,7 +167,7 @@ public class MainWindow extends javax.swing.JFrame {
         jMainPane.addTab("Bands", bandsPanel);
 
         gamesPanel.setLayout(new java.awt.GridLayout(1, 0));
-        jMainPane.addTab("Games", gamesPanel);
+        jMainPane.addTab("Pairings", gamesPanel);
 
         resultsPanel.setLayout(new java.awt.GridLayout(1, 0));
         jMainPane.addTab("Results", resultsPanel);
