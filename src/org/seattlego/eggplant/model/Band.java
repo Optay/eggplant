@@ -19,7 +19,7 @@ public class Band {
     private ArrayList<Player> players;
     private Rank max;
     private Rank min;
-    private boolean mutable;    // Determines if bands rank bounds can be changed.
+    private boolean mutable;    // Determines if band's rank bounds can be changed.
     
     /**
      * Create a Band for a specified rank. Band will be mutable.

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TournamentReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.usgo.org/tournaments/TournamentStandards/AGATournamentSchema.xsd">
+   <Header>
+      <Software>Eggplant</Software>
+      <StartDate>2014-05-02</StartDate>
+      <EndDate>2014-05-02</EndDate>
+      <TournamentName/>
+      <TournamentVenue>
+         <Name/>
+      </TournamentVenue>
+      <PairingFormat>MCMAHON</PairingFormat>
+      <Rules>JAPANESE</Rules>
+      <BasicTime>0</BasicTime>
+      <OvertimeFormat>
+         <Canadian StoneCount="25" TimeBlockSize="300"/>
+      </OvertimeFormat>
+      <TiebreakSystemList>
+         <System Method="MMS" Tier="1"/>
+         <System Method="SOSM" Tier="2"/>
+         <System Method="SOSOSM" Tier="3"/>
+         <System Method="NULL" Tier="4"/>
+         <System Method="NULL" Tier="5"/>
+         <System Method="NULL" Tier="6"/>
+      </TiebreakSystemList>
+      <Comment/>
+   </Header>
+   <PlayerList>
+      <Player FamilyName="CHO" GivenName="Byung W." ID="7701" InitialTournamentScore="38" Rating="5D" eggplantagarating="5.26" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="Beomgeun" ID="19984" InitialTournamentScore="38" Rating="9D" eggplantagarating="9.37" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="Andrew W. [Byong]" ID="2464" InitialTournamentScore="38" Rating="4D" eggplantagarating="4.75" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="Kyong Yeon" ID="8268" InitialTournamentScore="38" Rating="4D" eggplantagarating="4.87" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="Mansik" ID="3727" InitialTournamentScore="38" Rating="6D" eggplantagarating="6.02" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="James" ID="13399" InitialTournamentScore="38" Rating="2D" eggplantagarating="2.30" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="Chih-Chen" ID="4640" InitialTournamentScore="38" Rating="1D" eggplantagarating="1.99" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+      <Player FamilyName="CHO" GivenName="Michael" ID="19582" InitialTournamentScore="38" Rating="3D" eggplantagarating="3.93" eggplantparticipation="PAIRED,NOT_ASSIGNED,NOT_ASSIGNED,"/>
+   </PlayerList>
+   <RoundList>
+      <Round RoundNumber="1">
+         <Game BlackPlayerID="19984" GameResult="Unknown" Handicap="8" Komi="0" WhitePlayerID="4640" eggplantresult="UNKNOWN"/>
+         <Game BlackPlayerID="3727" GameResult="Unknown" Handicap="4" Komi="0" WhitePlayerID="13399" eggplantresult="UNKNOWN"/>
+         <Game BlackPlayerID="7701" GameResult="Unknown" Handicap="2" Komi="0" WhitePlayerID="19582" eggplantresult="UNKNOWN"/>
+         <Game BlackPlayerID="2464" GameResult="Unknown" Handicap="0" Komi="6" WhitePlayerID="8268" eggplantresult="UNKNOWN"/>
+      </Round>
+      <Round RoundNumber="2"/>
+      <Round RoundNumber="3"/>
+   </RoundList>
+   <eggplant>
+      <numberofrounds>3</numberofrounds>
+      <mmbar>1D</mmbar>
+      <mmfloor>20K</mmfloor>
+      <bandspacingscheme>STACKED</bandspacingscheme>
+      <lastroundforseedsystem>1</lastroundforseedsystem>
+      <pairingscheme1>SPLIT_AND_FOLD</pairingscheme1>
+      <pairingscheme2>SPLIT_AND_FOLD</pairingscheme2>
+      <handicapgames>false</handicapgames>
+      <maxhandicappedrank>9D</maxhandicappedrank>
+      <handicapbasis>RANK</handicapbasis>
+      <handicapmodifier>0</handicapmodifier>
+      <handicapceiling>9</handicapceiling>
+      <defaultkomi>6</defaultkomi>
+      <lastassignedagano>99999</lastassignedagano>
+      <absentnbwx2>0</absentnbwx2>
+      <absentmmsx2>0</absentmmsx2>
+      <byenbwx2>1</byenbwx2>
+      <byemmsx2>1</byemmsx2>
+   </eggplant>
+</TournamentReport>

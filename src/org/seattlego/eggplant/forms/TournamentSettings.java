@@ -2,6 +2,7 @@ package org.seattlego.eggplant.forms;
 
 import java.awt.CardLayout;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -180,6 +181,7 @@ public class TournamentSettings extends EggplantForm {
         
         // Handicap
         useHandicapCheck.setSelected( tournament.getPairingProps().getHandicapGames() );
+        setHandicapControlsEnabled( useHandicapCheck.isSelected() );
         maxHandicappedRankField.setText( tournament.getPairingProps().getMaxHandicappedRank().toString() );
         setRadioSelection( handicapBasis, tournament.getPairingProps().getHandicapBasis().name() );
         setRadioSelection( handicapModifier, Integer.toString( tournament.getPairingProps().getHandicapModifier() ) );
@@ -202,8 +204,6 @@ public class TournamentSettings extends EggplantForm {
         }
         * 
         */
-        
-        
         
         tfMMBar.setText( tournament.getPairingProps().getMMBar().toString() );
         tfMMFloor.setText( tournament.getPairingProps().getMMFloor().toString() );
@@ -263,6 +263,30 @@ public class TournamentSettings extends EggplantForm {
         }
         tournament.setChangedSinceLastSave(true);
     }
+    
+    /**
+     * Enable/disable handicap controls.
+     * @param enable 
+     */
+    private void setHandicapControlsEnabled( boolean enable ) {
+        maxHandicappedRankField.setEnabled( enable );
+        txfHdCeiling.setEnabled( enable );
+        setRadioButtonsEnabled( handicapBasis, enable );
+        setRadioButtonsEnabled( handicapModifier, enable );
+        jLabel8.setEnabled( enable );
+        jLabel13.setEnabled( enable );
+        jLabel29.setEnabled( enable );
+        jLabel30.setEnabled( enable );
+    }
+    
+    private void setRadioButtonsEnabled( ButtonGroup group, boolean enable ) {
+        ArrayList<AbstractButton> radios = Collections.list( group.getElements() );
+        for( AbstractButton radio : radios ) {
+            radio.setEnabled( enable );
+        }
+        
+    }
+    
     
     
     /**
@@ -1812,6 +1836,7 @@ public class TournamentSettings extends EggplantForm {
 
     private void useHandicapCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useHandicapCheckActionPerformed
         tournament.getPairingProps().setHandicapGames( useHandicapCheck.isSelected() );
+        setHandicapControlsEnabled( useHandicapCheck.isSelected() );
         tournament.setChangedSinceLastSave(true);
     }//GEN-LAST:event_useHandicapCheckActionPerformed
 

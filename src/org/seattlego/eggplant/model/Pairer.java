@@ -377,64 +377,67 @@ public class Pairer {
         int komi = pairingProps.getDefaultKomi();
         int hd = 0;
         
-        Rank pseudoRank1;
-        Rank pseudoRank2;
+        // Calculate handicap
+        if ( pairingProps.getHandicapGames() ) {
         
-        switch (pairingProps.getHandicapBasis()) {
-            case MMS:
-                // Note: MMS may not be an integer, but since we are creating a rank, we can just floor it safely.
-                pseudoRank1 = Rank.RankFromMms( (int)Math.floor( p1.getScore().getMetricUnscaled( roundIndex-1, PlacementCriterion.MMS ) ) );
-                pseudoRank2 = Rank.RankFromMms( (int)Math.floor( p2.getScore().getMetricUnscaled( roundIndex-1, PlacementCriterion.MMS ) ) );
-                /*
-                pseudoRank1 = Rank.RankFromMms( p1.getScore().getMetric( roundIndex-1, PlacementCriterion.MMS ) / PlacementCriterion.MMS.coef );
-                pseudoRank2 = Rank.RankFromMms( p2.getScore().getMetric( roundIndex-1, PlacementCriterion.MMS ) / PlacementCriterion.MMS.coef );
-                * 
-                */
-                break;
-            case RANK:
-            default:
-                pseudoRank1 = p1.getRank();
-                pseudoRank2 = p2.getRank();
-        }
-        
-        // Bound values
-        // Be careful not to adjust these references as they are not copies.
-        if ( pseudoRank1.compareTo( pairingProps.getMaxHandicappedRank() ) > 0 ) { pseudoRank1 = pairingProps.getMaxHandicappedRank(); }
-        if ( pseudoRank2.compareTo( pairingProps.getMaxHandicappedRank() ) > 0 ) { pseudoRank2 = pairingProps.getMaxHandicappedRank(); }
-        /*
-         * pre-comparable implementation
-        if ( pseudoRank1.getValue() > pairingProps.getMaxHandicappedRank().getValue() ) { pseudoRank1 = pairingProps.getMaxHandicappedRank(); }
-        if ( pseudoRank2.getValue() > pairingProps.getMaxHandicappedRank().getValue() ) { pseudoRank2 = pairingProps.getMaxHandicappedRank(); }
-        * 
-        */
-        
-        hd = pseudoRank1.getValue() - pseudoRank2.getValue();
+            Rank pseudoRank1;
+            Rank pseudoRank2;
 
-        if (hd > 0) {
-            hd = hd - pairingProps.getHandicapModifier();
-            if (hd < 0) {
-                hd = 0;
+            switch (pairingProps.getHandicapBasis()) {
+                case MMS:
+                    // Note: MMS may not be an integer, but since we are creating a rank, we can just floor it safely.
+                    pseudoRank1 = Rank.RankFromMms( (int)Math.floor( p1.getScore().getMetricUnscaled( roundIndex-1, PlacementCriterion.MMS ) ) );
+                    pseudoRank2 = Rank.RankFromMms( (int)Math.floor( p2.getScore().getMetricUnscaled( roundIndex-1, PlacementCriterion.MMS ) ) );
+                    /*
+                    pseudoRank1 = Rank.RankFromMms( p1.getScore().getMetric( roundIndex-1, PlacementCriterion.MMS ) / PlacementCriterion.MMS.coef );
+                    pseudoRank2 = Rank.RankFromMms( p2.getScore().getMetric( roundIndex-1, PlacementCriterion.MMS ) / PlacementCriterion.MMS.coef );
+                    * 
+                    */
+                    break;
+                case RANK:
+                default:
+                    pseudoRank1 = p1.getRank();
+                    pseudoRank2 = p2.getRank();
             }
-        }
-        if (hd < 0) {
-            hd = hd + pairingProps.getHandicapModifier();
+
+            // Bound values
+            // Be careful not to adjust these references as they are not copies.
+            if ( pseudoRank1.compareTo( pairingProps.getMaxHandicappedRank() ) > 0 ) { pseudoRank1 = pairingProps.getMaxHandicappedRank(); }
+            if ( pseudoRank2.compareTo( pairingProps.getMaxHandicappedRank() ) > 0 ) { pseudoRank2 = pairingProps.getMaxHandicappedRank(); }
+            /*
+            * pre-comparable implementation
+            if ( pseudoRank1.getValue() > pairingProps.getMaxHandicappedRank().getValue() ) { pseudoRank1 = pairingProps.getMaxHandicappedRank(); }
+            if ( pseudoRank2.getValue() > pairingProps.getMaxHandicappedRank().getValue() ) { pseudoRank2 = pairingProps.getMaxHandicappedRank(); }
+            * 
+            */
+
+            hd = pseudoRank1.getValue() - pseudoRank2.getValue();
+
             if (hd > 0) {
-                hd = 0;
+                hd = hd - pairingProps.getHandicapModifier();
+                if (hd < 0) {
+                    hd = 0;
+                }
+            }
+            if (hd < 0) {
+                hd = hd + pairingProps.getHandicapModifier();
+                if (hd > 0) {
+                    hd = 0;
+                }
+            }
+
+            //Logger.getLogger( Pairer.class.getName() ).log( Level.INFO, Integer.toString( hd ) );
+
+            // So tournament will know that handicap exceeded bounds.
+            g.setUnboundHandicap( Math.abs( hd) );
+
+            if (hd > pairingProps.getMaxHandicap()) {
+                hd = pairingProps.getMaxHandicap();
+            }
+            if (hd < -pairingProps.getMaxHandicap()) {
+                hd = -pairingProps.getMaxHandicap();
             }
         }
-        
-        //Logger.getLogger( Pairer.class.getName() ).log( Level.INFO, Integer.toString( hd ) );
-        
-        // So tournament will know that handicap exceeded bounds.
-        g.setUnboundHandicap( Math.abs( hd) );
-        
-        if (hd > pairingProps.getMaxHandicap()) {
-            hd = pairingProps.getMaxHandicap();
-        }
-        if (hd < -pairingProps.getMaxHandicap()) {
-            hd = -pairingProps.getMaxHandicap();
-        }
-        
         
         
         //Logger.getLogger( Pairer.class.getName() ).log( Level.INFO, Integer.toString( hd ) );

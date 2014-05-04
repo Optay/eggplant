@@ -170,6 +170,7 @@ public class Tournament implements ITournament {
      */
     @Override
     public boolean addLoadedPlayers( ArrayList<Player> loadedPlayers ) {
+        if ( loadedPlayers.size() == 0 ) { return true; }
         
         for ( Player p : loadedPlayers ) {
             // Add player without running band check.
