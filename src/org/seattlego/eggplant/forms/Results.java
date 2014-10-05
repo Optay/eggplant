@@ -8,8 +8,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -33,7 +36,11 @@ public class Results extends EggplantForm {
 
     private ObservableList<Game> games;
     private BindingGroup bindings;
-    private Game selectedGame;
+    //private Game selectedGame;
+
+    // for tracking clicks
+    private int mouseDownRow;
+    private int mouseDownCol;
     
     /**
      * Creates new form Results
@@ -57,12 +64,13 @@ public class Results extends EggplantForm {
         
         JTableBinding gamesBinding = SwingBindings.createJTableBinding( AutoBinding.UpdateStrategy.READ, games, tblGames, "gamesBinding");
         bindings.addBinding( gamesBinding );
+        /*
         bindings.addBinding( Bindings.createAutoBinding( AutoBinding.UpdateStrategy.READ_WRITE,
                                     this,
                                     BeanProperty.create("selectedGame"), 
                                     tblGames,
                                     BeanProperty.create("selectedElement_IGNORE_ADJUSTING") ) );
-        
+        */
         JTableBinding.ColumnBinding columnBinding;
         columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${tableNumberString}"));
         columnBinding.setColumnName("Table");
@@ -76,7 +84,13 @@ public class Results extends EggplantForm {
         
         TableRowSorter trsGames = new TableRowSorter( tblGames.getModel() );
         tblGames.setRowSorter( trsGames );
+        
+        RowSorter.SortKey defaultTableSort = new RowSorter.SortKey( 0 , SortOrder.ASCENDING );
+        trsGames.setSortKeys( Arrays.asList( defaultTableSort ) );
+        
+        
         //
+        
     }
     
     @Override
@@ -99,13 +113,14 @@ public class Results extends EggplantForm {
         games.clear();
         games.addAll( tournament.getGames( currentRoundIndex ) );
     }    
-    
+    /*
     public Game getSelectedGame() { return selectedGame; }
     public void setSelectedGame( Game g ) {
         Game old = selectedGame;
         selectedGame = g;
         firePropertyChange("selectedAlbum", old, getSelectedGame() );
     }
+    */
     
 
     /**
@@ -132,7 +147,7 @@ public class Results extends EggplantForm {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false
@@ -153,41 +168,49 @@ public class Results extends EggplantForm {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblGamesMouseClicked(evt);
             }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblGamesMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tblGamesMouseReleased(evt);
+            }
         });
         scpGames.setViewportView(tblGames);
-        tblGames.getColumnModel().getColumn(0).setPreferredWidth(20);
-        tblGames.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblGames.getColumnModel().getColumn(1).setCellRenderer(new ResultsTableCellRenderer());
-        tblGames.getColumnModel().getColumn(2).setPreferredWidth(200);
-        tblGames.getColumnModel().getColumn(2).setCellRenderer(new ResultsTableCellRenderer());
-        tblGames.getColumnModel().getColumn(3).setPreferredWidth(60);
+        if (tblGames.getColumnModel().getColumnCount() > 0) {
+            tblGames.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tblGames.getColumnModel().getColumn(1).setPreferredWidth(200);
+            tblGames.getColumnModel().getColumn(1).setCellRenderer(new ResultsTableCellRenderer());
+            tblGames.getColumnModel().getColumn(2).setPreferredWidth(200);
+            tblGames.getColumnModel().getColumn(2).setCellRenderer(new ResultsTableCellRenderer());
+            tblGames.getColumnModel().getColumn(3).setPreferredWidth(50);
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(roundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
-                        .addComponent(scpGames, javax.swing.GroupLayout.PREFERRED_SIZE, 554, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(roundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scpGames, javax.swing.GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(roundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scpGames, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                .addGap(111, 111, 111))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scpGames)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(roundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 411, Short.MAX_VALUE)))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void tblGamesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGamesMouseClicked
+        /*
         // Identify clicked cell, update game result accordingly.
         int col = tblGames.columnAtPoint(evt.getPoint());
         
@@ -228,7 +251,65 @@ public class Results extends EggplantForm {
         tournament.setChangedSinceLastSave(true);
         // Scoring info must be recalculated.
         tournament.setScoringValidity( false );
+                */
     }//GEN-LAST:event_tblGamesMouseClicked
+
+    private void tblGamesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGamesMousePressed
+        mouseDownRow = tblGames.rowAtPoint(evt.getPoint());
+        mouseDownCol = tblGames.columnAtPoint(evt.getPoint());
+    }//GEN-LAST:event_tblGamesMousePressed
+
+    private void tblGamesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGamesMouseReleased
+        if ( ( mouseDownRow != tblGames.rowAtPoint(evt.getPoint()) ) ||
+             ( mouseDownCol != tblGames.columnAtPoint(evt.getPoint()) ) ) {
+            mouseDownRow = -1;
+            mouseDownCol = -1;
+            return;
+        }
+
+        Game selectedGame = games.get( tblGames.convertRowIndexToModel( mouseDownRow ) );
+        
+        // Map the row to a game.
+        // TODO - ick, ick, ick! Literal strings! Need a better way of identifying columns.
+        switch ( tblGames.getColumnName( mouseDownCol ) ) {
+            case "White":
+                if ( selectedGame.getResult() == GameResult.WHITE ) {
+                    selectedGame.setResult( GameResult.UNKNOWN );
+                } else {
+                    selectedGame.setResult( GameResult.WHITE );
+                }
+                break;
+            case "Black":
+                if ( selectedGame.getResult() == GameResult.BLACK ) {
+                    selectedGame.setResult( GameResult.UNKNOWN );
+                } else {
+                    selectedGame.setResult( GameResult.BLACK );
+                }
+                break;
+            case "Result":
+                selectedGame.setResult( selectedGame.getResult().getNext() );
+                break;
+            default:
+                // no action
+                return;
+        }
+        
+        // Workaround
+        // Table will not update for this change as the ObservableList has not changed, so we change it.
+        //int index = games.indexOf( selectedGame );
+        games.remove( selectedGame );
+        games.add( selectedGame );
+        //tblGames.getRowSorter()
+        //
+        
+        tournament.setChangedSinceLastSave(true);
+        // Scoring info must be recalculated.
+        tournament.setScoringValidity( false );
+        
+        mouseDownRow = -1;
+        mouseDownCol = -1;
+        
+    }//GEN-LAST:event_tblGamesMouseReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel roundPanel;
@@ -262,7 +343,7 @@ class ResultsTableCellRenderer extends JLabel implements TableCellRenderer {
         }
         //setForeground( Color.BLACK );
         //setFont( new Font("Dialog", Font.PLAIN, 12 ) );
-        setText( typedValue.playerName );
+        setText( value.toString() );
 
         return this;
     }

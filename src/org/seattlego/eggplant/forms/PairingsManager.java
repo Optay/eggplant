@@ -381,8 +381,10 @@ public class PairingsManager extends EggplantForm {
         tblPairablePlayers.getTableHeader().setReorderingAllowed(false);
         scpPairablePlayers.setViewportView(tblPairablePlayers);
         tblPairablePlayers.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tblPairablePlayers.getColumnModel().getColumn(0).setPreferredWidth(200);
-        tblPairablePlayers.getColumnModel().getColumn(1).setPreferredWidth(15);
+        if (tblPairablePlayers.getColumnModel().getColumnCount() > 0) {
+            tblPairablePlayers.getColumnModel().getColumn(0).setPreferredWidth(200);
+            tblPairablePlayers.getColumnModel().getColumn(1).setPreferredWidth(15);
+        }
 
         txfNbUnpairablePlayers.setEditable(false);
         txfNbUnpairablePlayers.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -409,8 +411,10 @@ public class PairingsManager extends EggplantForm {
         tblUnpairablePlayers.getTableHeader().setReorderingAllowed(false);
         scpUnairablePlayers.setViewportView(tblUnpairablePlayers);
         tblUnpairablePlayers.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        tblUnpairablePlayers.getColumnModel().getColumn(0).setPreferredWidth(200);
-        tblUnpairablePlayers.getColumnModel().getColumn(1).setPreferredWidth(15);
+        if (tblUnpairablePlayers.getColumnModel().getColumnCount() > 0) {
+            tblUnpairablePlayers.getColumnModel().getColumn(0).setPreferredWidth(200);
+            tblUnpairablePlayers.getColumnModel().getColumn(1).setPreferredWidth(15);
+        }
 
         javax.swing.GroupLayout pnlPlayersLayout = new javax.swing.GroupLayout(pnlPlayers);
         pnlPlayers.setLayout(pnlPlayersLayout);
@@ -532,14 +536,17 @@ public class PairingsManager extends EggplantForm {
                 return canEdit [columnIndex];
             }
         });
+        tblGames.setColumnSelectionAllowed(true);
         tblGames.getTableHeader().setReorderingAllowed(false);
         scpGames.setViewportView(tblGames);
         tblGames.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tblGames.getColumnModel().getColumn(0).setPreferredWidth(10);
-        tblGames.getColumnModel().getColumn(1).setPreferredWidth(200);
-        tblGames.getColumnModel().getColumn(2).setPreferredWidth(200);
-        tblGames.getColumnModel().getColumn(3).setPreferredWidth(15);
-        tblGames.getColumnModel().getColumn(4).setPreferredWidth(15);
+        if (tblGames.getColumnModel().getColumnCount() > 0) {
+            tblGames.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tblGames.getColumnModel().getColumn(1).setPreferredWidth(200);
+            tblGames.getColumnModel().getColumn(2).setPreferredWidth(200);
+            tblGames.getColumnModel().getColumn(3).setPreferredWidth(15);
+            tblGames.getColumnModel().getColumn(4).setPreferredWidth(15);
+        }
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -656,6 +663,13 @@ public class PairingsManager extends EggplantForm {
         // Create a copy of the table and size the columns for printing:
         CustomPrintableTable printTable = new CustomPrintableTable( tblGames.getModel() );
         JScrollPane scroll = new JScrollPane( printTable );
+        
+        // Inherit sort
+        TableRowSorter printSorter = new TableRowSorter( printTable.getModel() );
+        printTable.setRowSorter( printSorter );
+        printSorter.setSortKeys( tblGames.getRowSorter().getSortKeys() );
+        //
+        
         
         printTable.getColumnModel().getColumn(0).setPreferredWidth( 22 );
         printTable.getColumnModel().getColumn(1).setPreferredWidth( 200 );

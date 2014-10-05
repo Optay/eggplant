@@ -2,6 +2,8 @@ package org.seattlego.eggplant.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
@@ -15,10 +17,11 @@ import java.util.logging.Logger;
 public class PlayerId {
     private int agaNo = 0;
     private Date membershipExpiration;
-    private String name;
-    private String firstName;
+    private String name = "";
+    private String firstName = "";
     private Rating rating;
     private String club;
+    private String[] names; // To facilitate filtering
     
     public PlayerId(){
         this( "", "", -30.5, 0, "", "" );
@@ -33,11 +36,11 @@ public class PlayerId {
             String _membershipExpiration,
             String _club
             ) {
-        
+
         if (_agaNo >= 0 )
             this.agaNo = _agaNo;
-        this.name = _name;
-        this.firstName = _firstName;
+        setName( _name );
+        setFirstName( _firstName );
         this.club = _club;
         this.rating = Rating.CreateRatingFromAGA( _rating );
         
@@ -117,6 +120,7 @@ public class PlayerId {
     public void setName( String _str )
     {
         name = _str;
+        updateNames();
     }
 
     public String getFirstName() {
@@ -125,7 +129,20 @@ public class PlayerId {
     public void setFirstName( String _str )
     {
         firstName = _str;
+        updateNames();
     }
+    
+    public String[] getNames() {
+        return names;
+    }
+    
+    private void updateNames() {
+        ArrayList<String> nameList = new ArrayList();
+        nameList.addAll(new ArrayList<String>( Arrays.asList( name.split(" ") ) ) );
+        nameList.addAll(new ArrayList<String>( Arrays.asList( firstName.split(" ") ) ) );
+        names = nameList.toArray( new String[nameList.size()] );
+    }
+    
     
     public String getFullName() {
         return name.toUpperCase() + " " + firstName;

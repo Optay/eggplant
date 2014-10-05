@@ -7,7 +7,7 @@ package org.seattlego.eggplant.model;
  * 
  * @author Topsy
  */
-public class FlaggedPlayerName {
+public class FlaggedPlayerName implements Comparable<FlaggedPlayerName> {
     public String playerName;
     public boolean isWinner;
     
@@ -15,4 +15,17 @@ public class FlaggedPlayerName {
         playerName = name;
         isWinner = won;
     }
+    
+    @Override
+    public int compareTo( FlaggedPlayerName otherPlayer ) {
+        return playerName.compareToIgnoreCase(otherPlayer.playerName);
+    }
+    
+    
+    @Override
+    public String toString() {
+        return playerName;
+    }
+    
+    
 }

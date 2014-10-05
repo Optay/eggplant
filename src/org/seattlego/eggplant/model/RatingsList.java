@@ -99,12 +99,28 @@ public class RatingsList {
             int filterLength = filter.length();
             if ( filterLength == 0 ) { continue; }
             
-            filteredList = new ArrayList<>();
+            boolean exact = false;
+            char[] filterray = filter.toCharArray();
+            if ( (filterray.length > 1) && (filterray[0] == '"') && (filterray[filterray.length - 1] == '"' ) ) {
+                exact = true;
+                filter = filter.substring(1, filter.length()-1);
+            }
             
-            for ( PlayerId pId : sourceList ) {
-                if ( pId.getName().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
-                if ( pId.getFirstName().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
-                if ( pId.getAGANoString().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+            filteredList = new ArrayList<>();
+            if ( exact ) {
+                for ( PlayerId pId : sourceList ) {
+                    for( String name : pId.getNames() ) {
+                        if ( name.equalsIgnoreCase(filter) ) { filteredList.add( pId ); continue; }
+                    }
+                    if ( pId.getAGANoString().equalsIgnoreCase(filter) ) { filteredList.add( pId ); continue; }
+                }
+            } else {
+                for ( PlayerId pId : sourceList ) {
+                    for( String name : pId.getNames() ) {
+                        if ( name.regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+                    }
+                    if ( pId.getAGANoString().regionMatches(true, 0, filter, 0, filterLength) ) { filteredList.add( pId ); continue; }
+                    }
             }
             sourceList = (ArrayList) filteredList.clone();;
         }

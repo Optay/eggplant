@@ -140,6 +140,8 @@ public class PlayersManager extends EggplantForm {
         });
         //
         
+        downloadProgress.setVisible(false);
+        
     }
     
     
@@ -368,9 +370,8 @@ public class PlayersManager extends EggplantForm {
         int contentLength = urlc.getContentLength();
         int nbChars = 0;
         
-        
- 
         if (progress != null) {
+            progress.setVisible(true);
             if ( contentLength > 0 ) {
                 progress.setValue(0);
             } else {
@@ -398,6 +399,7 @@ public class PlayersManager extends EggplantForm {
         if (progress != null) {
             progress.setValue( 0 );
             progress.setIndeterminate(false);
+            progress.setVisible(false);
         }
 
         output.close();
@@ -472,6 +474,7 @@ public class PlayersManager extends EggplantForm {
                 registeredPlayers.add( selectedPlayer );
                 resetPlayerDetails();
                 updateRegisteredCount();
+                focusOnSearch();    // Move focus to search: a convenience when adding players in bulk.
             } else {
                 // It didn't work: report the problem, leave form as is.
                 JOptionPane.showMessageDialog( Eggplant.getInstance().getMainWindow(), "Unable to add player.", "Alert", JOptionPane.INFORMATION_MESSAGE );
@@ -482,8 +485,8 @@ public class PlayersManager extends EggplantForm {
             // Sync the view and clear the form.
             updateControls();
             tournament.setChangedSinceLastSave(true);
+            focusOnSearch();    // Move focus to search: a convenience when adding players in bulk.
         }
-        
     }
     
     private void removePlayer() {
@@ -496,6 +499,11 @@ public class PlayersManager extends EggplantForm {
             JOptionPane.showMessageDialog( Eggplant.getInstance().getMainWindow(), "Player cannot be removed. Player is involved in a game or is the bye player for a round.", "Message", JOptionPane.ERROR_MESSAGE );
         }
         
+    }
+    
+    private void focusOnSearch() {
+        searchText.requestFocusInWindow();
+        searchText.setText(null);
     }
     
     private void setState( PlayersManagerState newState ) {
@@ -596,6 +604,7 @@ public class PlayersManager extends EggplantForm {
         jButton2 = new javax.swing.JButton();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Ratings List", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        jPanel2.setPreferredSize(new java.awt.Dimension(400, 251));
 
         jButton1.setText("Download...");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -625,6 +634,7 @@ public class PlayersManager extends EggplantForm {
         });
 
         jButton4.setText("Browse...");
+        jButton4.setAlignmentX(0.5F);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -642,18 +652,17 @@ public class PlayersManager extends EggplantForm {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(searchText))
-                    .addComponent(downloadProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
-                        .addGap(0, 62, Short.MAX_VALUE))
+                        .addComponent(downloadProgress, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
@@ -663,15 +672,14 @@ public class PlayersManager extends EggplantForm {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
                     .addComponent(jButton4)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(downloadProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(downloadProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(searchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9))
-                .addGap(8, 8, 8)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -746,7 +754,7 @@ public class PlayersManager extends EggplantForm {
 
         jLabel1.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel1.setText("Name");
+        jLabel1.setText("Last Name");
 
         rankResetButton.setText("=");
         rankResetButton.addActionListener(new java.awt.event.ActionListener() {
@@ -848,7 +856,7 @@ public class PlayersManager extends EggplantForm {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -880,6 +888,7 @@ public class PlayersManager extends EggplantForm {
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Registered Players (0)"));
+        jPanel3.setPreferredSize(new java.awt.Dimension(400, 73));
 
         registeredPlayersTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -907,8 +916,10 @@ public class PlayersManager extends EggplantForm {
         registeredPlayersTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         registeredPlayersTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(registeredPlayersTable);
-        registeredPlayersTable.getColumnModel().getColumn(0).setPreferredWidth(200);
-        registeredPlayersTable.getColumnModel().getColumn(1).setPreferredWidth(15);
+        if (registeredPlayersTable.getColumnModel().getColumnCount() > 0) {
+            registeredPlayersTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+            registeredPlayersTable.getColumnModel().getColumn(1).setPreferredWidth(15);
+        }
 
         jButton2.setText("Print...");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -948,9 +959,9 @@ public class PlayersManager extends EggplantForm {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE))
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -960,7 +971,7 @@ public class PlayersManager extends EggplantForm {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
