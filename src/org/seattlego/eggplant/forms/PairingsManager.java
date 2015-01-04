@@ -117,8 +117,9 @@ public class PairingsManager extends EggplantForm {
         tblGames.setAutoCreateColumnsFromModel(false);
         
         JTableBinding gamesBinding = SwingBindings.createJTableBinding( AutoBinding.UpdateStrategy.READ, games, tblGames, "gamesBinding");
-        columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${tableNumberString}"));
+        columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${tableNumber}"));
         columnBinding.setColumnName("Table");
+        columnBinding.setColumnClass( Integer.class );
         columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${whitePlayer.id.fullName}"));
         columnBinding.setColumnName("White");
         columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${blackPlayer.id.fullName}"));
@@ -522,7 +523,7 @@ public class PairingsManager extends EggplantForm {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false
@@ -536,7 +537,7 @@ public class PairingsManager extends EggplantForm {
                 return canEdit [columnIndex];
             }
         });
-        tblGames.setColumnSelectionAllowed(true);
+        tblGames.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblGames.getTableHeader().setReorderingAllowed(false);
         scpGames.setViewportView(tblGames);
         tblGames.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -753,7 +754,7 @@ public class PairingsManager extends EggplantForm {
             if ( newG.getUnboundHandicap() > tournament.getPairingProps().getMaxHandicap() ) {
                 alertBuilder.append("Table ").
                     append(newG.getTableNumberString()).
-                    append(": Correct handicap exceeds maximum handicap for this tournament.");
+                    append(": Correct handicap exceeds maximum handicap for this tournament.\n");
             }
         }
         

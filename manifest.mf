@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.8.3
-Created-By: 1.7.0_10-b18 (Oracle Corporation)
+Ant-Version: Apache Ant 1.9.4
+Created-By: 1.8.0_20-b26 (Oracle Corporation)
 Bundle-Name: Eggplant
-Bundle-Version: 1.0.43
-Bundle-Date: 2014-05-03 22:12:39 PDT
+Bundle-Version: 1.0.45
+Bundle-Date: 2015-01-03 21:25:34 PST
 Implementation-Title: Eggplant
-Implementation-Version: 1.0.43
+Implementation-Version: 1.0.45
 

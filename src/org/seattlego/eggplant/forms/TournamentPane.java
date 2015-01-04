@@ -64,6 +64,7 @@ public class TournamentPane extends EggplantForm {
     private boolean saveTournament() {
         if ( Eggplant.lastSaveFile != null) {
             XmlEncoderAGA.TournamentToFile( tournament, Eggplant.lastSaveFile );
+            tournament.setChangedSinceLastSave(false);
             return true;
         } else {
             return saveTournamentAs();
@@ -83,6 +84,7 @@ public class TournamentPane extends EggplantForm {
         Eggplant.lastSaveFolder = selectedFile.getParentFile();
         Eggplant.lastSaveFile = selectedFile;
         
+        tournament.setChangedSinceLastSave(false);
         return true;
     }
 
@@ -134,9 +136,17 @@ public class TournamentPane extends EggplantForm {
     
     @Override
     protected void updateControls() {
+        String name = tournament.getProps().getName();
+        
         jLabel2.setText( tournament.getProps().getName() );
         jLabel4.setText( tournament.getProps().getStartDateString() );
         jLabel3.setText( tournament.getProps().getEndDateString() );
+        
+        
+        if ( name.equals("") ) { name = "Eggplant"; }
+        else { name = "Eggplant - " + name; }
+        Eggplant.getInstance().getMainWindow().setTitle( name );
+        
     }
     
     /*

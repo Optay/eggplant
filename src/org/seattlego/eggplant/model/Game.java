@@ -96,12 +96,17 @@ public class Game {
     public int getTableIndex() {
         return tableIndex;
     }
-    public String getTableNumberString() {
-        return Integer.toString( tableIndex + 1 );
-    }
     public void setTableIndex(int tableIndex) {
         this.tableIndex = tableIndex;
     }
+    
+    public String getTableNumberString() {
+        return Integer.toString( getTableNumber() );
+    }
+    public Integer getTableNumber() {
+        return tableIndex + 1;
+    }
+    
 
     public int getHandicap() {
         return handicap;

@@ -7,7 +7,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 /**
- *
+ * Terribly named...
  * @author Topsy
  */
 public class CustomPrintableTable extends JTable {
@@ -22,7 +22,8 @@ public class CustomPrintableTable extends JTable {
         super( tableModel, columnModel );
     }
     
-    /** 
+    /**
+     * @return CustomTablePrintable
     * @inherited <p>
     */
     @Override

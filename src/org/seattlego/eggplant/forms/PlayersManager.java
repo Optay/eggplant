@@ -1,6 +1,7 @@
 package org.seattlego.eggplant.forms;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.print.PrinterException;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -233,17 +234,22 @@ public class PlayersManager extends EggplantForm {
                 return;
             
             // Attempt download
+            /*
             download( downloadProgress, strDefaultURL, fDefaultFile);
             loadLocalFile();
+            */
             
             // TODO - fix the async download
-            //downloadBackground( strDefaultURL, fDefaultFile);
+            downloadInBackground( strDefaultURL, fDefaultFile);
             //
         } catch (MalformedURLException ex) {
             JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Malformed URL\nRating list could not be loaded", "Message", JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(Eggplant.getInstance().getMainWindow(), "Unreachable file\nRating list could not be loaded", "Message", JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (Exception ex) {
+            Logger.getLogger(PlayersManager.class.toString()).log(Level.WARNING, ex.getMessage() );
             return;
         }
 
@@ -291,21 +297,26 @@ public class PlayersManager extends EggplantForm {
         jList1.setModel( listModel );
     }
     
-    /*
-    private void downloadBackground( String strURL, File destination) throws MalformedURLException, IOException {
-        String strFooRL = "http://www.optay.com/dump/MaximizeTest.zip";
+    
+    private void downloadInBackground( String strURL, File destination) throws MalformedURLException, IOException {
+        setEnabledListControls(false);
+        availablePlayers.clear();
+        syncList();
+        
+        //String strFooRL = "http://optay.com/wp-content/uploads/2014/05/robot_dance.mp4";
+        //String strFooRL = "http://optay.com/host/pitcher/Pitcher.swf";
          
-        JFrame rootFrame = Eggplant.getInstance().base;
+        Component mainWindow = Eggplant.getInstance().getMainWindow();
         
         URL url;
         URLConnection urlc;
         BufferedInputStream input;
         final FileOutputStream output;
 
-        final ProgressMonitorInputStream progressMonitor;
+        final ProgressMonitorInputStream progressStream;
                 
         try {
-            url = new URL( strFooRL );
+            url = new URL( strURL );
             urlc = url.openConnection();
 
 
@@ -313,40 +324,51 @@ public class PlayersManager extends EggplantForm {
             output = new FileOutputStream( destination );
 
         } catch ( IOException ex ) {
+            Logger.getLogger(PlayersManager.class.toString()).log(Level.WARNING, "IOException opening stream.");
             return;
         }
         
-        progressMonitor = new ProgressMonitorInputStream( rootFrame, "Downloading tdlista...",  input );
-        progressMonitor.getProgressMonitor().setMaximum( urlc.getContentLength() );
-        progressMonitor.getProgressMonitor().setMillisToDecideToPopup( 0 );
-        progressMonitor.getProgressMonitor().setMillisToPopup( 0 );
+        progressStream = new ProgressMonitorInputStream( mainWindow, "Downloading tdlista...",  input );
+        progressStream.getProgressMonitor().setMaximum( urlc.getContentLength() );
+        progressStream.getProgressMonitor().setMillisToDecideToPopup( 0 );
+        progressStream.getProgressMonitor().setMillisToPopup( 0 );
                 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
 
                 int i;
                 
-                while ((i = progressMonitor.read()) != -1) {
-                    output.write(i);
-                    
+                try {
+                    while ((i = progressStream.read()) != -1) {
+                        output.write(i);
+                    }
+                    output.close();
+                    progressStream.close();
+                } catch ( IOException ex ) {
+                    Logger.getLogger(PlayersManager.class.toString()).log(Level.WARNING, ex.getMessage() );
                 }
-                output.close();
-                progressMonitor.close();
                 
                 return null;
             }
             
             @Override
             public void done() {
-                loadLocalFile();
+                String message = "Worker task done.\n" + 
+                                  Boolean.toString(progressStream.getProgressMonitor().isCanceled() );
+                Logger.getLogger(PlayersManager.class.toString()).log(Level.INFO, message );
+                
+                if ( !progressStream.getProgressMonitor().isCanceled() ) {
+                    loadLocalFile();
+                } else {
+                    // Load was canceled, leave the list blank
+                }
+                setEnabledListControls(true);
             }
         };
         worker.execute();
     }
-    * 
-    */
     
     
     private void download( JProgressBar progress, String strURL, File destination) throws MalformedURLException, IOException {
@@ -404,7 +426,15 @@ public class PlayersManager extends EggplantForm {
 
         output.close();
         input.close();
-    }    
+    }
+    
+    
+    private void setEnabledListControls( boolean enabled ){
+        jButton1.setEnabled(enabled);
+        jButton4.setEnabled(enabled);
+        jButton3.setEnabled(enabled);
+    }
+    
     
     private void addPlayer() {
         
@@ -669,11 +699,12 @@ public class PlayersManager extends EggplantForm {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4)
-                    .addComponent(jButton1)
-                    .addComponent(downloadProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(downloadProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton3)
+                        .addComponent(jButton4)
+                        .addComponent(jButton1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(searchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1054,7 +1085,7 @@ public class PlayersManager extends EggplantForm {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // Just load the local copy of TDListA
+        // Just load the local copy of TDListA at the default location
         loadLocalFile();
     }//GEN-LAST:event_jButton3ActionPerformed
 

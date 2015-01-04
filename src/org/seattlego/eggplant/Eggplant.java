@@ -77,7 +77,7 @@ public class Eggplant {
      * 
      * @return Reference to main window for dialog placement.
      */
-    public Component getMainWindow() {
+    public MainWindow getMainWindow() {
         return mainWindow;
     }
     

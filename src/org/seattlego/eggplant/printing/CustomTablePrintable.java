@@ -14,6 +14,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 /**
+ * Terribly named...
  * 
  * Replacement TablePrintable that supports multi-line headers and automatically
  * resizes table to printable width for consistent appearance. The tables that
