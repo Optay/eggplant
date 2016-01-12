@@ -67,6 +67,7 @@ public class PairingsManager extends EggplantForm {
         tblPairablePlayers.setRowSorter( trsPairablePlayers );
         
         // TODO - EEK! Hardcoded column numbers. For shame... Find these columns by name perhaps.
+        // This default sort is by table number which is in column 1.
         RowSorter.SortKey defaultSort = new RowSorter.SortKey( 1 , SortOrder.DESCENDING );
         trsPairablePlayers.setSortKeys( Arrays.asList( defaultSort ) );
         //        

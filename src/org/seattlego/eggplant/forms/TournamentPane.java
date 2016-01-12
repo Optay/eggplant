@@ -7,13 +7,18 @@ package org.seattlego.eggplant.forms;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.seattlego.eggplant.Eggplant;
 import org.seattlego.eggplant.interfaces.ITournament;
+import org.seattlego.eggplant.io.DecodeResult;
 import org.seattlego.eggplant.io.ReportGenerator;
 import org.seattlego.eggplant.io.XmlEncoderAGA;
+import org.seattlego.eggplant.model.Game;
+import org.seattlego.eggplant.model.Player;
+import org.seattlego.eggplant.model.Tournament;
 
 /**
  *
@@ -27,20 +32,7 @@ public class TournamentPane extends EggplantForm {
     public TournamentPane() {
         initComponents();
         
-        // Report version number
-/*        ResourceBundle rb = ResourceBundle.getBundle("project.properties"); 
-        Logger.getLogger( TournamentPane.class.getName()  ).log( Level.INFO, rb.getString("application.buildnumber") );
-        labelText.setText( rb.getString("application.buildnumber") );*/
-        //
-        
-        String version = "";
-        Package pack = Eggplant.class.getPackage();
-        if ( ( pack == null )  || ( pack.getImplementationVersion() == null ) ) {
-            version = "version not available";
-        } else {
-            version = pack.getImplementationVersion();
-        }
-        labelText.setText( version );
+        labelText.setText( Eggplant.version );
         
     }
 
@@ -63,7 +55,7 @@ public class TournamentPane extends EggplantForm {
     
     private boolean saveTournament() {
         if ( Eggplant.lastSaveFile != null) {
-            XmlEncoderAGA.TournamentToFile( tournament, Eggplant.lastSaveFile );
+            XmlEncoderAGA.TournamentToFile( tournament, Eggplant.lastSaveFile, Eggplant.version );
             tournament.setChangedSinceLastSave(false);
             return true;
         } else {
@@ -80,7 +72,7 @@ public class TournamentPane extends EggplantForm {
         
         File selectedFile = fileChoice.getSelectedFile();
         
-        XmlEncoderAGA.TournamentToFile( tournament, selectedFile );
+        XmlEncoderAGA.TournamentToFile( tournament, selectedFile, Eggplant.version );
         Eggplant.lastSaveFolder = selectedFile.getParentFile();
         Eggplant.lastSaveFile = selectedFile;
         
@@ -103,8 +95,29 @@ public class TournamentPane extends EggplantForm {
         }
         
         File selectedFile = fileChoice.getSelectedFile();
-        Eggplant.getInstance().openTournament( XmlEncoderAGA.TournamentFromFile( selectedFile ) );
-        Eggplant.lastSaveFile = selectedFile;
+        Tournament newTournament = new Tournament();
+        DecodeResult decodeResult = XmlEncoderAGA.TournamentFromFile( selectedFile, newTournament);
+        
+        // Prompt to fix bad save from v1.0.45 and earlier.
+        if ( decodeResult == DecodeResult.Unversioned) {
+            int response = JOptionPane.showConfirmDialog(Eggplant.getInstance().getMainWindow(), "This file was created with v1.0.45 or earlier.\nSave files from v1.0.45 and earlier inverted the players black/white in all games.\nTo compensate, players can be inverted now during load.\nNote that this option will not be presented after the tournament has been saved with this version of Eggplant.\nVerify that the players are correct before resaving the file. Invert players?", "Query", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (response == JOptionPane.CANCEL_OPTION) {
+                decodeResult = DecodeResult.Failure;
+            }
+            // Invert players white/black in all games
+            if (response == JOptionPane.YES_OPTION) {
+                ArrayList<Game> allGames = newTournament.getGamesBefore( newTournament.getPairingProps().getNumberOfRounds() + 1 );
+                for ( Game g : allGames ) {
+                    Player white = g.getWhitePlayer();
+                    g.setWhitePlayer( g.getBlackPlayer() );
+                    g.setBlackPlayer( white );
+                }
+            }
+        }
+        if ( decodeResult != DecodeResult.Failure ) {
+            Eggplant.getInstance().openTournament( newTournament );
+            Eggplant.lastSaveFile = selectedFile;
+        }
         
         String report = XmlEncoderAGA.getLoadReport();
         if ( !report.equals("") ) {

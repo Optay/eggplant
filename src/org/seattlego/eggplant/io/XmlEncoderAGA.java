@@ -45,7 +45,7 @@ public class XmlEncoderAGA {
     /*
      * Encode a tournament object to a target file.
      */
-    public static void TournamentToFile( ITournament tournament, File destination ) {
+    public static void TournamentToFile( ITournament tournament, File destination, String version ) {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder;
         try {
@@ -60,6 +60,7 @@ public class XmlEncoderAGA {
         // TournamentReport
         Element rootElement = document.createElement("TournamentReport");
         rootElement.setAttributeNS( "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation", "http://www.usgo.org/tournaments/TournamentStandards/AGATournamentSchema.xsd");
+        rootElement.setAttribute("eggplant-version", version);
         document.appendChild(rootElement);
         
         
@@ -147,8 +148,8 @@ TournamentStaffList
             ArrayList<Game> games = tournament.getGames( i );
             for (Game game : games ) {
                 Element gameElement = document.createElement( "Game" );
-                gameElement.setAttribute("WhitePlayerID", game.getBlackPlayer().getId().getAGANoString() );
-                gameElement.setAttribute("BlackPlayerID", game.getWhitePlayer().getId().getAGANoString() );
+                gameElement.setAttribute("WhitePlayerID", game.getWhitePlayer().getId().getAGANoString() );
+                gameElement.setAttribute("BlackPlayerID", game.getBlackPlayer().getId().getAGANoString() );
                 gameElement.setAttribute("Komi", Integer.toString( game.getKomi() ) );
                 gameElement.setAttribute("Handicap", Integer.toString( game.getHandicap() ) );
                 gameElement.setAttribute("GameResult", GameResult.toAGAString( game.getResult() ) );
@@ -270,11 +271,11 @@ TournamentStaffList
      * file.
      * 
      */
-    public static Tournament TournamentFromFile( File tournamentFile ) {
+    public static DecodeResult TournamentFromFile( File tournamentFile, Tournament tournament ) {
         loadReport = "";
         StringBuilder reportBuilder = new StringBuilder("");
         
-        Tournament tournament = new Tournament();
+        //Tournament tournament = new Tournament();
     
 	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
@@ -285,7 +286,7 @@ TournamentStaffList
             Logger.getLogger( XmlEncoderAGA.class.getName()).log(Level.SEVERE, null, ex);
             reportBuilder.append("Eggplant is unable to parse files.");
             
-            return null;
+            return DecodeResult.Failure;
         }
         Document document;
         try {
@@ -293,10 +294,30 @@ TournamentStaffList
         } catch ( SAXException | IOException ex ) {
             Logger.getLogger( XmlEncoderAGA.class.getName()).log(Level.SEVERE, null, ex);
             reportBuilder.append("\nEggplant is unable to parse the file.");
-            return null;
+            return DecodeResult.Failure;
         }
         
         document.getDocumentElement().normalize();
+        
+        // Version
+        Element root = (Element) document.getElementsByTagName( "TournamentReport" ).item( 0 );
+        boolean unversionedSave = false; // Unversioned saves (versions 1.0.45 and earlier) have white and black players flipped (WOWZA!)
+        if ( root.hasAttribute("eggplant-version") ) {
+            // We don't have any version-filtering to do right now since the save format has not changed.
+            // The addition of version number in the save is solely to fix the player inversion bug
+            /*
+            String version = root.getAttribute("eggplant-version");
+            String[] versionParts = version.split(".");
+            if ( versionParts.length == 3 ) {
+                // Version <= 1.0.45
+                flippedSave = ( ( Integer.parseInt(versionParts[0]) <= 1) && ( Integer.parseInt(versionParts[1]) <= 0 ) && ( Integer.parseInt(versionParts[2]) <= 45) );
+            } else {
+                // Invalid version string, probably a test (IDE) build
+            }
+            */
+        } else {
+            unversionedSave = true; // Unversioned save
+        }
         
         // Header
         Element header = (Element) document.getElementsByTagName( "Header" ).item( 0 );
@@ -601,7 +622,11 @@ TournamentStaffList
             loadReport = reportBuilder.toString();
         }
         
-        return tournament;
+        if ( unversionedSave ) {
+            return DecodeResult.Unversioned;
+        } else {
+            return DecodeResult.Success;
+        }
     }
     
     private static Element CreatePlayerElement( Document document, Player player, int numberOfRounds ) {

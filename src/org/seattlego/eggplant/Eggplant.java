@@ -28,6 +28,7 @@ public class Eggplant {
     public static File lastSaveFile;
     public static File lastExportFolder;
     
+    public static String version;
     
     private MainWindow mainWindow;
     
@@ -49,6 +50,14 @@ public class Eggplant {
         Eggplant.lastExportFolder = Eggplant.rootFolder;
         
         configureLogging();
+        
+        // Put version string in easily accessible static variable
+        Package pack = Eggplant.class.getPackage();
+        if ( ( pack == null )  || ( pack.getImplementationVersion() == null ) ) {
+            Eggplant.version = "test build";
+        } else {
+            Eggplant.version = pack.getImplementationVersion();
+        }        
         
         mainWindow = new MainWindow();
         mainWindow.setVisible(true);

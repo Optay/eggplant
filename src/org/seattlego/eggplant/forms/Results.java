@@ -74,6 +74,7 @@ public class Results extends EggplantForm {
         JTableBinding.ColumnBinding columnBinding;
         columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${tableNumberString}"));
         columnBinding.setColumnName("Table");
+        columnBinding.setColumnClass( Integer.class );
         columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${whiteFlagged}"));
         columnBinding.setColumnName("White");
         columnBinding = gamesBinding.addColumnBinding(ELProperty.create("${blackFlagged}"));

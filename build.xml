@@ -63,14 +63,16 @@
 
     -->
 	<target name="-pre-jar" description="Increment build number and add bundle/implementation data to manifest.">
+            <!-- Auto-increment build number. Better to do it manually to prevent inflating when making test builds.
 		<propertyfile file="nbproject/version.properties">
 			<entry key="application.buildnumber" value="1" type="int" operation="+"/>
 		</propertyfile>
+            -->
 		
 		<property file="nbproject/version.properties"/>
 		
 		<property name="project.name" value="Eggplant" />
-		<property name="version.num" value="1.0.${application.buildnumber}" />
+		<property name="version.num" value="1.0.46" />
 		
 		<tstamp>
 			<format property="NOW" pattern="yyyy-MM-dd HH:mm:ss z" />
